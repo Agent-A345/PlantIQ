@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.git/
+.env
+voyage_faiss_db/
+query_cache/
