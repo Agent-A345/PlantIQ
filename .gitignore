@@ -1,0 +1,6 @@
+.env
+voyage_faiss_db/
+query_cache/
+desktop.ini
+__pycache__/
+*.pyc
