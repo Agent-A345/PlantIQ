@@ -10,5 +10,4 @@ services:
       - ./voyage_faiss_db:/app/voyage_faiss_db
       - ./demo_docs_refinery:/app/demo_docs_refinery
       - ./query_cache:/app/query_cache
-      - ./knowledge_graph.pkl:/app/knowledge_graph.pkl
     restart: unless-stopped
