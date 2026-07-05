@@ -2,5 +2,6 @@
 voyage_faiss_db/
 query_cache/
 desktop.ini
+knowledge_graph.pkl
 __pycache__/
 *.pyc
