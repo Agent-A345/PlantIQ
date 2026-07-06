@@ -1,0 +1,3578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PlantIQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#0d1117; --bg2:#0f1923; --bg3:#131d2e; --bg4:#1a2744;
+  --border:#1e2d45; --border2:#243552;
+  --text:#c9d6e8; --text2:#7d8fa8; --text3:#4a5a72;
+  --blue:#3b82f6; --blue2:#1d4ed8; --blue-glow:rgba(59,130,246,0.15);
+  --green:#10b981; --amber:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+  --radius:10px; --sidebar:260px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html,body{height:100%;height:100dvh;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+
+/* ── DESKTOP LAYOUT ── */
+.layout{display:flex;height:100vh;height:100dvh;}
+
+/* Sidebar */
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform 0.3s ease;}
+.sidebar-inner{flex:1;overflow-y:auto;padding:0 0 16px 0;}
+.sidebar-inner::-webkit-scrollbar{width:3px;}
+.sidebar-inner::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.logo-wrap{padding:18px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--blue2),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.logo-text{font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
+.logo-text span{color:var(--blue);}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:1px;letter-spacing:0.3px;text-transform:uppercase;}
+.sidebar-close{display:none;margin-left:auto;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:4px;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 12px 10px;}
+.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 8px;text-align:center;}
+.stat-num{font-size:22px;font-weight:700;color:var(--blue);line-height:1;}
+.stat-lbl{font-size:9px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px;}
+.sec-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:14px 14px 6px;}
+.upload-zone{margin:0 12px 10px;border:1.5px dashed var(--border2);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-glow);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;}
+.upload-icon{font-size:20px;margin-bottom:6px;}
+.upload-text{font-size:12px;color:var(--text2);line-height:1.5;}
+.upload-text strong{color:var(--blue);}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;margin:0 12px 8px;padding:9px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;width:calc(100% - 24px);}
+.btn:hover,.btn:active{background:var(--bg4);border-color:var(--blue);color:#fff;}
+.btn-primary{background:var(--blue2);border-color:var(--blue);color:#fff;}
+.btn-primary:hover,.btn-primary:active{background:var(--blue);}
+.btn-danger{border-color:rgba(239,68,68,0.3);color:#f87171;}
+.btn-danger:hover,.btn-danger:active{background:rgba(239,68,68,0.1);border-color:var(--red);color:#fff;}
+.doc-item{display:flex;align-items:center;gap:8px;margin:0 12px 4px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--text2);overflow:hidden;}
+.doc-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.doc-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.upload-progress{margin:0 12px 8px;height:3px;background:var(--bg3);border-radius:3px;overflow:hidden;display:none;}
+.upload-progress-bar{height:100%;background:var(--blue);width:0;transition:width 0.3s;border-radius:3px;}
+.sidebar-footer{padding:12px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);text-align:center;line-height:1.6;}
+
+/* Plant selector */
+.plant-selector{padding:10px 12px 4px;}
+.plant-selector-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.plant-select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;outline:none;transition:all 0.15s;}
+.plant-select:hover{background:var(--bg4);}
+.plant-select:focus{border-color:var(--blue);}
+.plant-select option{background:var(--bg3);color:var(--text);}
+
+/* Language selector */
+.lang-selector{padding:10px 12px 4px;}
+.lang-selector-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.lang-select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;outline:none;transition:all 0.15s;}
+.lang-select:hover{background:var(--bg4);}
+.lang-select:focus{border-color:var(--blue);}
+.lang-select option{background:var(--bg3);color:var(--text);}
+
+/* Voice input mic button */
+.mic-btn{width:44px;height:44px;min-width:44px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;color:var(--text2);font-size:17px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.mic-btn:hover{background:var(--bg4);color:var(--text);}
+.mic-btn.listening{background:#ef4444;border-color:#ef4444;color:#fff;animation:mic-pulse 1.2s ease-in-out infinite;}
+.hands-free-btn.hands-free-active{background:var(--teal,#0d9488);border-color:var(--teal,#0d9488);color:#fff;box-shadow:0 0 0 3px rgba(13,148,136,0.2);}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.5);}50%{box-shadow:0 0 0 8px rgba(239,68,68,0);}}
+.mic-unsupported{display:none;}
+
+/* Read-aloud speaker button on bot bubbles */
+.speak-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.speak-btn:hover{background:var(--bg4);color:var(--text);}
+.speak-btn.speaking{background:var(--blue);border-color:var(--blue);color:#fff;}
+.speak-btn.loading{background:var(--bg4);color:var(--text2);cursor:wait;opacity:0.8;}
+
+/* Agent selector */
+.agent-selector{padding:10px 12px 4px;}
+.agent-selector-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.agent-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;margin-bottom:5px;}
+.agent-btn:hover,.agent-btn:active{background:var(--bg4);color:var(--text);}
+.agent-btn.active{border-color:var(--agent-color,var(--blue));background:rgba(59,130,246,0.08);color:#fff;}
+.agent-icon{font-size:14px;width:20px;text-align:center;}
+.agent-dot{width:6px;height:6px;border-radius:50%;background:var(--agent-color,var(--blue));margin-left:auto;flex-shrink:0;}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);min-width:0;}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;height:62px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.hamburger{display:none;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:6px;border-radius:6px;flex-shrink:0;}
+.hamburger:active{background:var(--bg3);}
+.topbar-brand{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.2px;}
+.topbar-brand span{color:var(--blue);}
+.topbar-sep{width:1px;height:16px;background:var(--border);}
+.topbar-sub{font-size:12px;color:var(--text3);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:5px;}
+.live-badge{display:flex;align-items:center;gap:5px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--green);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.active-agent-badge{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;border:1px solid;transition:all 0.3s;}
+
+/* Mobile agent strip */
+.mobile-agent-strip{display:none;}
+
+/* Chat */
+.chat-wrap{flex:1;overflow-y:auto;padding:20px 0;-webkit-overflow-scrolling:touch;}
+.chat-wrap::-webkit-scrollbar{width:4px;}
+.chat-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.chat-inner{max-width:760px;margin:0 auto;padding:0 20px;}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55vh;text-align:center;gap:10px;}
+.empty-logo{width:60px;height:60px;background:linear-gradient(135deg,var(--blue2),var(--blue));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:4px;box-shadow:0 0 40px var(--blue-glow);}
+.empty h2{font-size:18px;font-weight:600;color:#fff;}
+.empty p{font-size:13px;color:var(--text2);max-width:340px;line-height:1.6;}
+
+/* Proactive alert banner */
+.alert-banner-wrap{max-width:760px;margin:14px auto 0;padding:0 20px;display:flex;flex-direction:column;gap:8px;}
+.alert-banner{display:flex;align-items:flex-start;gap:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px 12px;cursor:pointer;transition:background 0.15s;}
+.alert-banner:hover{background:rgba(239,68,68,0.14);}
+.alert-banner.medium{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);}
+.alert-banner.medium:hover{background:rgba(245,158,11,0.14);}
+.alert-banner-icon{font-size:16px;flex-shrink:0;line-height:1.3;}
+.alert-banner-body{flex:1;min-width:0;}
+.alert-banner-title{font-size:12.5px;font-weight:600;color:#fca5a5;margin-bottom:2px;}
+.alert-banner.medium .alert-banner-title{color:#fcd34d;}
+.alert-banner-text{font-size:12px;color:var(--text2);line-height:1.5;}
+.alert-banner-tag{display:inline-block;background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:600;color:#fff;margin-right:6px;}
+.risk-source-badge{display:inline-block;margin-top:6px;font-size:9.5px;padding:2px 7px;border-radius:5px;font-weight:600;letter-spacing:0.2px;}
+.risk-source-badge.computed{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);}
+.risk-source-badge.static{background:rgba(148,163,184,0.12);color:#94a3b8;border:1px solid rgba(148,163,184,0.25);}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px;}
+.chip{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:8px 14px;font-size:13px;color:var(--blue);cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.chip:hover,.chip:active{background:var(--bg4);border-color:var(--blue);color:#fff;}
+.msg{margin-bottom:18px;}
+.msg-user{display:flex;justify-content:flex-end;}
+.bubble-user{background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;padding:11px 15px;border-radius:18px 18px 4px 18px;font-size:14px;line-height:1.6;max-width:78%;box-shadow:0 4px 20px rgba(59,130,246,0.2);}
+.msg-bot{display:flex;gap:10px;align-items:flex-start;}
+.bot-av{width:32px;height:32px;min-width:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:2px;}
+.bot-content{flex:1;min-width:0;}
+.bubble-bot{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:4px 18px 18px 18px;font-size:14px;line-height:1.75;}
+.bubble-bot p{margin-bottom:8px;}
+.bubble-bot p:last-child{margin-bottom:0;}
+.bubble-bot ul,.bubble-bot ol{padding-left:18px;margin:8px 0;}
+.bubble-bot li{margin-bottom:4px;}
+.bubble-bot strong{color:#e2e8f0;font-weight:600;}
+.msg-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:0.1px;}
+.badge-high{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);}
+.badge-medium{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);}
+.badge-low{background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);}
+.badge-src{background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.badge-src:active{background:rgba(59,130,246,0.2);}
+.active-badge{background:rgba(59,130,246,0.25)!important;border-color:var(--blue)!important;color:#fff!important;}
+.badge-agent{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;}
+.src-drawer{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-top:8px;overflow:hidden;display:none;}
+.src-drawer.open{display:block;}
+.src-drawer-head{padding:10px 14px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--border);}
+.src-item{padding:12px 14px;border-bottom:1px solid var(--border);}
+.src-item:last-child{border-bottom:none;}
+.src-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;}
+.src-item-name{font-size:12px;font-weight:600;color:#c9d6e8;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.src-item-loc{font-size:11px;color:var(--text3);flex-shrink:0;}
+.src-bar-wrap{height:3px;background:var(--bg3);border-radius:3px;}
+.src-bar{height:3px;background:var(--blue);border-radius:3px;}
+.src-text{font-size:12px;color:var(--text2);line-height:1.6;}
+.thinking{display:flex;gap:10px;align-items:center;margin-bottom:18px;}
+.thinking-dots{display:flex;gap:5px;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:4px 18px 18px 18px;}
+.thinking-dots span{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:bounce 1.2s infinite ease-in-out;}
+.thinking-dots span:nth-child(2){animation-delay:0.2s;}
+.thinking-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-6px);opacity:1}}
+
+/* Input bar */
+.input-bar{flex-shrink:0;padding:12px 16px calc(12px + var(--safe-bottom));background:var(--bg);border-top:1px solid var(--border);}
+.input-wrap{max-width:760px;margin:0 auto;display:flex;gap:8px;align-items:flex-end;}
+.input-box{flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:11px 14px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;resize:none;outline:none;transition:border-color 0.15s;min-height:46px;max-height:120px;line-height:1.5;}
+.input-box::placeholder{color:var(--text3);}
+.input-box:focus{border-color:var(--blue);}
+.send-btn{width:44px;height:44px;min-width:44px;background:var(--blue);border:none;border-radius:12px;color:#fff;font-size:18px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.send-btn:active{background:#2563eb;transform:scale(0.95);}
+.send-btn:disabled{background:var(--bg3);color:var(--text3);cursor:not-allowed;transform:none;}
+.input-hint{text-align:center;font-size:11px;color:var(--text3);margin-top:6px;}
+
+/* Overlay for mobile sidebar */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;backdrop-filter:blur(2px);}
+.overlay.show{display:block;}
+
+/* Toast */
+.toast{position:fixed;bottom:calc(80px + var(--safe-bottom));right:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:1000;max-width:calc(100vw - 32px);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-success{border-color:rgba(16,185,129,0.4);}
+.toast-error{border-color:rgba(239,68,68,0.4);}
+*{scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+
+/* Graph tab button */
+.graph-tab-btn {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 9px; padding: 7px 12px;
+  color: var(--text2); font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 3px; min-width: 58px; line-height: 1.2;
+}
+.graph-tab-btn .btn-icon { font-size: 18px; line-height: 1; }
+.graph-tab-btn .btn-label { font-size: 10.5px; white-space: nowrap; }
+.graph-tab-btn:hover, .graph-tab-btn.active {
+  background: var(--bg4); border-color: var(--blue); color: #fff;
+}
+
+/* Graph view overlay */
+.graph-view {
+  display: none; flex: 1; flex-direction: column;
+  background: var(--bg); overflow: hidden;
+}
+.graph-view.show { display: flex; }
+.graph-header {
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.graph-header h3 { font-size: 15px; font-weight: 600; color: #fff; }
+.graph-header p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.graph-stats { display: flex; gap: 12px; margin-left: auto; }
+.graph-stat { font-size: 11px; color: var(--text2); background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; }
+.graph-stat span { color: var(--blue); font-weight: 600; }
+.graph-canvas-wrap { flex: 1; position: relative; overflow: hidden; }
+
+.health-grid-wrap{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;align-content:start;}
+.health-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;transition:transform 0.15s;}
+.health-card:hover{transform:translateY(-2px);}
+.health-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.health-card-tag{font-size:13px;font-weight:700;color:#fff;}
+.health-card-name{font-size:11px;color:var(--text3);margin-top:2px;}
+.health-score-ring{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
+.health-bar-track{width:100%;height:6px;background:var(--bg4);border-radius:4px;overflow:hidden;margin:8px 0;}
+.health-bar-fill{height:100%;border-radius:4px;transition:width 0.4s;}
+.health-card-risk{font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;display:inline-block;}
+.health-card-source{font-size:9px;color:var(--text3);margin-top:6px;}
+.health-card-forecast{font-size:10px;color:#93c5fd;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.4;}
+#graph-canvas { width: 100%; height: 100%; }
+.graph-legend {
+  position: absolute; bottom: 16px; left: 16px;
+  background: rgba(13,17,23,0.9); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px;
+  display: flex; flex-wrap: wrap; gap: 8px; max-width: 500px;
+}
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.node-tooltip {
+  position: absolute; background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--text);
+  pointer-events: none; max-width: 280px; line-height: 1.6;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: none; z-index: 10;
+}
+
+/* Critical equipment panel */
+.critical-panel {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(13,17,23,0.95); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 12px 16px; max-width: 260px;
+  font-size: 12px;
+}
+.critical-panel h4 { font-size: 11px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+.critical-eq { display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--border); }
+.critical-eq:last-child { border-bottom: none; padding-bottom: 0; }
+.critical-eq-tag { font-size: 12px; font-weight: 600; color: var(--blue); min-width: 50px; }
+.critical-eq-risk { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+.risk-critical { background: rgba(239,68,68,0.15); color: #ef4444; }
+.risk-high { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.critical-eq-detail { font-size: 11px; color: var(--text2); line-height: 1.4; }
+.pid-panel{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:5;display:none;flex-direction:column;overflow:hidden;}
+.pid-panel.show{display:flex;}
+.pid-split{display:flex;flex:1;overflow:hidden;}
+.pid-image-wrap{flex:1.4;padding:16px;overflow:auto;background:var(--bg2);border-right:1px solid var(--border);display:flex;align-items:flex-start;justify-content:center;}
+.pid-image-wrap img{max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px;background:#f8f9fa;}
+.pid-results{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.pid-section{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.pid-section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;}
+.pid-tag{display:inline-flex;align-items:center;background:var(--bg4);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--text);margin:2px;font-family:monospace;}
+.pid-conn{font-size:12px;color:var(--text2);padding:4px 0;border-bottom:0.5px solid var(--border);}
+.pid-conn:last-child{border-bottom:none;}
+.pid-upload-btn{background:var(--blue2);border:none;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;cursor:pointer;margin:4px;transition:all 0.15s;}
+.pid-upload-btn:hover{background:var(--blue);}
+.pid-upload-btn.sec{background:var(--bg3);border:1px solid var(--border2);color:var(--text);}
+.pid-upload-btn.sec:hover{border-color:var(--blue);color:#fff;}
+
+/* ── MOBILE STYLES (max-width: 768px) ── */
+@media (max-width: 768px) {
+  /* Use interactive viewport so keyboard doesn't break layout */
+  html, body { height: 100%; height: 100dvh; }
+  .layout { height: 100%; height: 100dvh; }
+  /* Chat area absorbs the resize, input stays visible */
+  .chat-wrap { flex: 1; min-height: 0; }
+  /* Sidebar becomes slide-over drawer */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    width: 280px;
+    min-width: 280px;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-close { display: block; }
+  .hamburger { display: flex; }
+  .topbar-sep, .topbar-sub { display: none; }
+  .active-agent-badge { display: none; }
+
+  /* Mobile agent strip below topbar */
+  .mobile-agent-strip {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .mobile-agent-strip::-webkit-scrollbar { display: none; }
+  .mobile-agent-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+  .mobile-agent-pill.active {
+    background: var(--bg4);
+    border-color: var(--agent-color, var(--blue));
+    color: #fff;
+  }
+
+  /* Chat area */
+  .chat-inner { padding: 0 12px; }
+  .bubble-user { max-width: 85%; font-size: 14px; }
+  .bubble-bot { font-size: 13px; padding: 11px 14px; }
+  .bot-av { width: 28px; height: 28px; min-width: 28px; font-size: 13px; }
+  .empty h2 { font-size: 16px; }
+  .empty p { font-size: 12px; }
+  .chips { gap: 6px; }
+  .chip { font-size: 12px; padding: 7px 12px; }
+
+  /* Input */
+  .input-bar { padding: 10px 12px calc(10px + var(--safe-bottom)); }
+  .input-box { font-size: 16px; } /* 16px prevents iOS zoom */
+  .input-hint { display: none; }
+
+  /* Topbar */
+  .topbar { padding: 0 8px; height: 52px; }
+  .topbar-brand { font-size: 13px; }
+
+  /* Topbar right: scroll horizontally, never wrap */
+  .topbar-right {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-shrink: 1;
+    gap: 4px;
+  }
+  .topbar-right::-webkit-scrollbar { display: none; }
+
+  /* Topbar buttons: smaller on mobile */
+  .graph-tab-btn {
+    padding: 5px 7px;
+    min-width: 44px;
+    border-radius: 7px;
+    flex-shrink: 0;
+  }
+  .graph-tab-btn .btn-icon { font-size: 14px; }
+  .graph-tab-btn .btn-label { font-size: 9px; }
+
+  /* Stats row bigger touch targets */
+  .stat-num { font-size: 20px; }
+  .btn { padding: 11px 12px; font-size: 13px; }
+
+  /* Source badges wrap nicely */
+  .msg-meta { gap: 5px; }
+  .badge { font-size: 10px; padding: 3px 7px; }
+
+  /* All panels: full width padding on mobile */
+  .wo-header, .sp-header, .rdt-body,
+  .ipm-controls, .mwo-left, .rca-left,
+  .whatif-controls { padding: 12px; }
+  .wo-list, .sp-body, .ipm-results,
+  .mwo-right, .rca-right, .whatif-results { padding: 12px; }
+
+  /* Split panels stack vertically on mobile */
+  .whatif-body, .ipm-body, .mwo-body, .rca-body {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .whatif-controls, .ipm-controls, .mwo-left, .rca-left {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+  .whatif-results, .ipm-results, .mwo-right, .rca-right {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* WO cards reduce padding */
+  .wo-card { padding: 10px 12px; gap: 10px; }
+  .wo-rank { font-size: 18px; min-width: 26px; }
+
+  /* Carbon panel wider on mobile */
+  .carbon-panel { width: calc(100vw - 24px); right: 12px; }
+}
+
+/* ── SMALL PHONES (max-width: 390px) ── */
+@media (max-width: 390px) {
+  .bubble-user { max-width: 90%; }
+  .chip { font-size: 11px; padding: 6px 10px; }
+  .topbar-brand { font-size: 13px; }
+}
+
+/* ── Work Order Priority Panel ── */
+.wo-view { display:none; flex:1; flex-direction:column; background:var(--bg); overflow:hidden; }
+.wo-view.show { display:flex; }
+.wo-header { padding:16px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.wo-header h3 { font-size:15px; font-weight:600; color:#fff; }
+.wo-header p { font-size:12px; color:var(--text2); margin-top:2px; }
+.wo-stats { display:flex; gap:10px; margin-left:auto; flex-wrap:wrap; }
+.wo-stat { font-size:11px; color:var(--text2); background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:4px 10px; }
+.wo-stat span { font-weight:600; }
+.wo-list { flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+.wo-list::-webkit-scrollbar { width:4px; }
+.wo-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+.wo-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; gap:14px; align-items:flex-start; transition:border-color 0.15s; cursor:pointer; }
+.wo-card:hover { border-color:var(--blue); }
+.wo-card.urgency-immediate { border-left:3px solid #ef4444; }
+.wo-card.urgency-this-shift { border-left:3px solid #f59e0b; }
+.wo-card.urgency-this-week { border-left:3px solid #3b82f6; }
+.wo-card.urgency-monitor { border-left:3px solid var(--border2); }
+.wo-rank { font-size:22px; font-weight:800; color:var(--text3); min-width:32px; text-align:center; line-height:1; margin-top:2px; }
+.wo-card.urgency-immediate .wo-rank { color:#ef4444; }
+.wo-card.urgency-this-shift .wo-rank { color:#f59e0b; }
+.wo-card.urgency-this-week .wo-rank { color:#3b82f6; }
+.wo-body { flex:1; min-width:0; }
+.wo-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+.wo-tag { font-size:13px; font-weight:700; color:#fff; }
+.wo-name { font-size:12px; color:var(--text2); }
+.wo-urgency-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; letter-spacing:0.3px; flex-shrink:0; }
+.wo-urgency-badge.immediate { background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); }
+.wo-urgency-badge.this-shift { background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); }
+.wo-urgency-badge.this-week { background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+.wo-urgency-badge.monitor { background:rgba(100,116,139,0.15); color:#94a3b8; border:1px solid rgba(100,116,139,0.3); }
+.wo-action { font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:6px; }
+.wo-reasons { font-size:11.5px; color:var(--text2); line-height:1.6; }
+.wo-reasons span { display:inline-block; background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:1px 6px; margin:2px 3px 2px 0; font-size:11px; }
+.wo-score-bar-wrap { min-width:52px; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.wo-score-num { font-size:18px; font-weight:800; color:var(--text2); line-height:1; }
+.wo-card.urgency-immediate .wo-score-num { color:#ef4444; }
+.wo-card.urgency-this-shift .wo-score-num { color:#f59e0b; }
+.wo-card.urgency-this-week .wo-score-num { color:#60a5fa; }
+.wo-score-label { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:0.4px; }
+.wo-score-bar { width:36px; height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.wo-score-bar-fill { height:100%; border-radius:2px; background:var(--blue); }
+.wo-forecast-pill { display:inline-block; font-size:10.5px; color:#818cf8; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:4px; padding:2px 7px; margin-top:5px; }
+.wo-empty { color:var(--text3); font-size:13px; text-align:center; margin:60px auto; }
+
+/* ── What-If Simulator ── */
+.whatif-view{display:none;flex:1;flex-direction:column;background:var(--bg);overflow:hidden;}
+.whatif-view.show{display:flex;}
+.whatif-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.whatif-header h3{font-size:15px;font-weight:600;color:#fff;}
+.whatif-header p{font-size:12px;color:var(--text2);margin-top:2px;}
+.whatif-body{display:flex;flex:1;overflow:hidden;}
+.whatif-controls{width:320px;min-width:320px;border-right:1px solid var(--border);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;}
+.whatif-controls::-webkit-scrollbar{width:3px;}
+.whatif-controls::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.whatif-results{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.whatif-results::-webkit-scrollbar{width:3px;}
+.whatif-results::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.wi-section-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+.wi-eq-select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;outline:none;}
+.wi-eq-select:focus{border-color:var(--blue);}
+.wi-eq-select option{background:var(--bg3);}
+.wi-param-block{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.wi-param-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.wi-param-meta{font-size:11px;color:var(--text3);margin-bottom:8px;}
+.wi-param-row{display:flex;align-items:center;gap:8px;}
+.wi-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;outline:none;cursor:pointer;background:var(--bg3);}
+.wi-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 2px var(--blue);}
+.wi-val-display{font-size:13px;font-weight:700;color:var(--blue);min-width:52px;text-align:right;}
+.wi-threshold-pills{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
+.wi-thr-pill{font-size:9.5px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.wi-thr-watch{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);}
+.wi-thr-alert{background:rgba(249,115,22,0.12);color:#f97316;border:1px solid rgba(249,115,22,0.25);}
+.wi-thr-critical{background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);}
+.wi-defer-block{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.wi-defer-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+.wi-defer-num{width:64px;padding:7px 8px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-weight:600;text-align:center;outline:none;}
+.wi-defer-num:focus{border-color:var(--blue);}
+.wi-run-btn{width:100%;padding:11px;border-radius:10px;background:var(--blue2);border:1px solid var(--blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.wi-run-btn:hover{background:var(--blue);}
+.wi-run-btn:disabled{background:var(--bg3);border-color:var(--border);color:var(--text3);cursor:not-allowed;}
+.wi-reset-btn{width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--border2);color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.15s;}
+.wi-reset-btn:hover{border-color:var(--red);color:#f87171;}
+.wi-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--text3);}
+.wi-placeholder-icon{font-size:40px;opacity:0.4;}
+.wi-placeholder-text{font-size:13px;text-align:center;line-height:1.6;}
+/* Results cards */
+.wi-compare-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.wi-state-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.wi-state-card.baseline-card{border-color:var(--border2);}
+.wi-state-card.sim-card{border-color:rgba(59,130,246,0.4);}
+.wi-state-card.sim-card.escalated{border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.04);}
+.wi-state-card.sim-card.improved{border-color:rgba(16,185,129,0.5);background:rgba(16,185,129,0.04);}
+.wi-state-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;}
+.wi-state-risk{font-size:16px;font-weight:800;margin-bottom:4px;}
+.wi-state-score{font-size:12px;color:var(--text2);margin-bottom:6px;}
+.wi-state-alert{font-size:11px;color:var(--text2);line-height:1.5;}
+.wi-forecast-line{font-size:11px;color:#818cf8;margin-top:6px;font-style:italic;}
+.wi-delta-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.wi-delta-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.wi-insight{display:flex;gap:8px;font-size:12px;color:var(--text);line-height:1.6;padding:5px 0;border-bottom:1px solid var(--border);}
+.wi-insight:last-child{border-bottom:none;}
+.wi-insight-icon{flex-shrink:0;font-size:14px;}
+.wi-cascade-card{background:var(--bg2);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px;}
+.wi-cascade-item{font-size:12px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;}
+.wi-cascade-item:last-child{border-bottom:none;}
+.wi-cascade-tag{font-weight:600;color:#f59e0b;min-width:52px;}
+.wi-ask-btn{width:100%;padding:10px;border-radius:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.wi-ask-btn:hover{background:rgba(59,130,246,0.2);color:#fff;}
+
+/* ── Incident Pattern Matcher ── */
+.ipm-view{display:none;flex:1;flex-direction:column;background:var(--bg);overflow:hidden;}
+.ipm-view.show{display:flex;}
+.ipm-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.ipm-header h3{font-size:15px;font-weight:600;color:#fff;}
+.ipm-header p{font-size:12px;color:var(--text2);margin-top:2px;}
+.ipm-body{display:flex;flex:1;overflow:hidden;}
+.ipm-controls{width:300px;min-width:300px;border-right:1px solid var(--border);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.ipm-controls::-webkit-scrollbar{width:3px;}
+.ipm-controls::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.ipm-results{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.ipm-results::-webkit-scrollbar{width:3px;}
+.ipm-results::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.ipm-textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;resize:none;outline:none;min-height:90px;line-height:1.5;}
+.ipm-textarea:focus{border-color:var(--blue);}
+.ipm-textarea::placeholder{color:var(--text3);}
+.ipm-chips-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;}
+.ipm-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.ipm-chip{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all 0.15s;}
+.ipm-chip:hover{border-color:var(--blue);color:var(--text);}
+.ipm-chip.selected{background:rgba(59,130,246,0.15);border-color:var(--blue);color:#60a5fa;}
+.ipm-search-btn{width:100%;padding:11px;border-radius:10px;background:var(--blue2);border:1px solid var(--blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.ipm-search-btn:hover{background:var(--blue);}
+.ipm-search-btn:disabled{background:var(--bg3);border-color:var(--border);color:var(--text3);cursor:not-allowed;}
+.ipm-clear-btn{width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--border2);color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.15s;}
+.ipm-clear-btn:hover{border-color:rgba(239,68,68,0.4);color:#f87171;}
+.ipm-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--text3);}
+.ipm-placeholder-icon{font-size:40px;opacity:0.4;}
+.ipm-placeholder-text{font-size:13px;text-align:center;line-height:1.6;max-width:280px;}
+/* Match cards */
+.ipm-match-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.ipm-match-header{padding:12px 14px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid var(--border);}
+.ipm-match-score{min-width:48px;text-align:center;}
+.ipm-score-num{font-size:20px;font-weight:800;line-height:1;}
+.ipm-score-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;}
+.ipm-match-meta{flex:1;min-width:0;}
+.ipm-match-id{font-size:11px;color:var(--text3);margin-bottom:2px;}
+.ipm-match-type{font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;}
+.ipm-match-badges{display:flex;gap:5px;flex-wrap:wrap;}
+.ipm-badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;}
+.ipm-badge-sev-high{background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);}
+.ipm-badge-sev-med{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);}
+.ipm-badge-sev-low{background:rgba(100,116,139,0.12);color:#94a3b8;border:1px solid rgba(100,116,139,0.25);}
+.ipm-badge-h2s{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
+.ipm-badge-injury{background:rgba(249,115,22,0.12);color:#fb923c;border:1px solid rgba(249,115,22,0.3);}
+.ipm-badge-signal{background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);}
+.ipm-match-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+.ipm-section-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;}
+.ipm-root-cause{font-size:12px;color:var(--text);line-height:1.6;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:6px;padding:8px 10px;}
+.ipm-precursor{font-size:12px;color:var(--text2);line-height:1.6;background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.15);border-radius:6px;padding:8px 10px;}
+.ipm-capa{display:flex;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);}
+.ipm-capa:last-child{border-bottom:none;}
+.ipm-capa-status{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;flex-shrink:0;height:fit-content;}
+.capa-done{background:rgba(16,185,129,0.12);color:#10b981;}
+.capa-inprog{background:rgba(245,158,11,0.12);color:#f59e0b;}
+.ipm-eq-now{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);}
+.ipm-eq-tag{font-weight:600;color:var(--blue);}
+.ipm-no-match{color:var(--text3);font-size:13px;text-align:center;padding:40px 20px;line-height:1.6;}
+.ipm-ask-btn{width:100%;padding:9px;border-radius:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;margin-top:4px;}
+.ipm-ask-btn:hover{background:rgba(59,130,246,0.2);color:#fff;}
+
+/* ── Spare Parts Gap Analyzer ── */
+.sp-view{display:none;flex:1;flex-direction:column;background:var(--bg);overflow:hidden;}
+.sp-view.show{display:flex;}
+.sp-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.sp-header-text h3{font-size:15px;font-weight:600;color:#fff;}
+.sp-header-text p{font-size:12px;color:var(--text2);margin-top:2px;}
+.sp-stats{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap;}
+.sp-stat{font-size:11px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 12px;text-align:center;}
+.sp-stat-val{font-size:16px;font-weight:800;display:block;line-height:1.2;}
+.sp-stat-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);}
+.sp-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:16px;}
+.sp-body::-webkit-scrollbar{width:4px;}
+.sp-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.sp-section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.sp-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+/* Gap cards */
+.sp-gap-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;}
+.sp-gap-card.sev-critical{border-left:3px solid #ef4444;}
+.sp-gap-card.sev-high{border-left:3px solid #f97316;}
+.sp-gap-card.sev-medium{border-left:3px solid #f59e0b;}
+.sp-gap-card.sev-low{border-left:3px solid #64748b;}
+.sp-gap-left{flex:1;min-width:0;}
+.sp-gap-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px;}
+.sp-gap-name{font-size:13px;font-weight:600;color:#fff;}
+.sp-gap-partno{font-size:11px;color:var(--text3);}
+.sp-sev-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.sp-sev-badge.critical{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);}
+.sp-sev-badge.high{background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);}
+.sp-sev-badge.medium{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);}
+.sp-sev-badge.low{background:rgba(100,116,139,0.12);color:#94a3b8;border:1px solid rgba(100,116,139,0.3);}
+.sp-stock-status{font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;}
+.sp-stock-out{background:rgba(239,68,68,0.12);color:#ef4444;}
+.sp-stock-low{background:rgba(245,158,11,0.12);color:#f59e0b;}
+.sp-stock-ok{background:rgba(16,185,129,0.12);color:#10b981;}
+.sp-gap-meta{display:flex;gap:12px;font-size:11.5px;color:var(--text2);flex-wrap:wrap;margin-top:4px;}
+.sp-gap-meta span{display:flex;align-items:center;gap:4px;}
+.sp-gap-eq-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.sp-eq-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);}
+.sp-eq-tag.risk-critical{background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.25);}
+.sp-eq-tag.risk-high{background:rgba(249,115,22,0.1);color:#f97316;border-color:rgba(249,115,22,0.25);}
+.sp-eq-tag.risk-medium-high{background:rgba(245,158,11,0.1);color:#f59e0b;border-color:rgba(245,158,11,0.25);}
+.sp-exposure{text-align:right;min-width:90px;flex-shrink:0;}
+.sp-exposure-val{font-size:17px;font-weight:800;color:#ef4444;line-height:1;}
+.sp-exposure-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;}
+.sp-exposure-zero{font-size:11px;color:var(--text3);margin-top:4px;}
+/* Coverage table */
+.sp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sp-table th{text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--bg3);}
+.sp-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
+.sp-table tr:hover td{background:var(--bg3);}
+.sp-placeholder{color:var(--text3);font-size:13px;text-align:center;padding:40px;}
+
+/* ── Regulatory Deadline Tracker ── */
+.rdt-view{display:none;flex:1;flex-direction:column;background:var(--bg);overflow:hidden;}
+.rdt-view.show{display:flex;}
+.rdt-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.rdt-header-text h3{font-size:15px;font-weight:600;color:#fff;}
+.rdt-header-text p{font-size:12px;color:var(--text2);margin-top:2px;}
+.rdt-stats{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+.rdt-stat{font-size:11px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;text-align:center;min-width:64px;}
+.rdt-stat-val{font-size:18px;font-weight:800;display:block;line-height:1.2;}
+.rdt-stat-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);}
+.rdt-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;}
+.rdt-body::-webkit-scrollbar{width:4px;}
+.rdt-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+/* Filter pills */
+.rdt-filters{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:4px;}
+.rdt-filter{font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all 0.15s;}
+.rdt-filter:hover{border-color:var(--blue);color:var(--text);}
+.rdt-filter.active{background:rgba(59,130,246,0.15);border-color:var(--blue);color:#60a5fa;}
+.rdt-filter.filter-overdue.active{background:rgba(239,68,68,0.15);border-color:#ef4444;color:#ef4444;}
+.rdt-filter.filter-due-soon.active{background:rgba(245,158,11,0.15);border-color:#f59e0b;color:#f59e0b;}
+/* Item cards */
+.rdt-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;}
+.rdt-item.status-overdue{border-left:3px solid #ef4444;}
+.rdt-item.status-due_soon{border-left:3px solid #f59e0b;}
+.rdt-item.status-upcoming{border-left:3px solid #3b82f6;}
+.rdt-item.status-in_progress{border-left:3px solid #8b5cf6;}
+.rdt-item.status-completed{border-left:3px solid #10b981;opacity:0.65;}
+.rdt-days-badge{min-width:68px;text-align:center;flex-shrink:0;}
+.rdt-days-num{font-size:22px;font-weight:800;line-height:1;}
+.rdt-days-unit{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);}
+.rdt-days-badge.overdue .rdt-days-num{color:#ef4444;}
+.rdt-days-badge.due_soon .rdt-days-num{color:#f59e0b;}
+.rdt-days-badge.upcoming .rdt-days-num{color:#60a5fa;}
+.rdt-days-badge.completed .rdt-days-num{color:#10b981;font-size:16px;}
+.rdt-item-body{flex:1;min-width:0;}
+.rdt-item-top{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:5px;}
+.rdt-item-desc{font-size:13px;font-weight:600;color:#fff;flex:1;}
+.rdt-status-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;}
+.rdt-status-badge.overdue{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);}
+.rdt-status-badge.due_soon{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);}
+.rdt-status-badge.upcoming{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);}
+.rdt-status-badge.completed{background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);}
+.rdt-status-badge.in_progress{background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);}
+.rdt-sev-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
+.rdt-sev-critical{background:rgba(239,68,68,0.12);color:#ef4444;}
+.rdt-sev-high{background:rgba(249,115,22,0.12);color:#f97316;}
+.rdt-sev-medium{background:rgba(245,158,11,0.12);color:#f59e0b;}
+.rdt-sev-low{background:rgba(100,116,139,0.12);color:#94a3b8;}
+.rdt-item-meta{display:flex;gap:12px;font-size:11.5px;color:var(--text2);flex-wrap:wrap;margin-bottom:5px;}
+.rdt-item-action{font-size:11.5px;color:var(--text2);background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:5px;padding:5px 8px;line-height:1.5;}
+.rdt-empty{color:var(--text3);font-size:13px;text-align:center;padding:40px;}
+
+/* ── Maintenance Window Optimizer ── */
+.mwo-view{display:none;flex:1;flex-direction:column;background:var(--bg);overflow:hidden;}
+.mwo-view.show{display:flex;}
+.mwo-header{padding:16px 24px;border-bottom:1px solid var(--border);}
+.mwo-header h3{font-size:15px;font-weight:600;color:#fff;}
+.mwo-header p{font-size:12px;color:var(--text2);margin-top:2px;}
+.mwo-body{display:flex;flex:1;overflow:hidden;}
+.mwo-left{width:280px;min-width:280px;border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+.mwo-left::-webkit-scrollbar{width:3px;}
+.mwo-right{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.mwo-right::-webkit-scrollbar{width:4px;}
+.mwo-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.mwo-eq-select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;outline:none;}
+.mwo-eq-select:focus{border-color:var(--blue);}
+.mwo-plan-btn{width:100%;padding:11px;border-radius:10px;background:var(--blue2);border:1px solid var(--blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.mwo-plan-btn:hover{background:var(--blue);}
+.mwo-plan-btn:disabled{background:var(--bg3);border-color:var(--border);color:var(--text3);cursor:not-allowed;}
+.mwo-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--text3);}
+.mwo-placeholder-icon{font-size:40px;opacity:0.4;}
+.mwo-placeholder-text{font-size:13px;text-align:center;line-height:1.6;}
+/* Summary banner */
+.mwo-summary-banner{background:linear-gradient(135deg,rgba(13,148,136,0.15),rgba(59,130,246,0.1));border:1px solid rgba(13,148,136,0.3);border-radius:12px;padding:14px 16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;}
+.mwo-summary-stat{text-align:center;}
+.mwo-summary-val{font-size:22px;font-weight:800;color:#0D9488;line-height:1;}
+.mwo-summary-val.saved{color:#10b981;}
+.mwo-summary-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);}
+/* Primary card */
+.mwo-primary-card{background:var(--bg2);border:2px solid rgba(239,68,68,0.4);border-radius:10px;padding:12px 14px;}
+.mwo-primary-label{font-size:10px;font-weight:600;color:#ef4444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.mwo-primary-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.mwo-primary-tag{font-size:16px;font-weight:800;color:#fff;}
+.mwo-primary-name{font-size:12px;color:var(--text2);}
+.mwo-primary-meta{display:flex;gap:10px;font-size:11.5px;color:var(--text2);margin-top:6px;flex-wrap:wrap;}
+/* Section labels */
+.mwo-section{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;display:flex;align-items:center;gap:6px;}
+.mwo-section::after{content:"";flex:1;height:1px;background:var(--border);}
+/* Candidate cards */
+.mwo-candidate{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;}
+.mwo-candidate.score-high{border-left:3px solid #10b981;}
+.mwo-candidate.score-med{border-left:3px solid #3b82f6;}
+.mwo-candidate.score-low{border-left:3px solid var(--border2);}
+.mwo-score-circle{min-width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+.mwo-score-circle.high{background:rgba(16,185,129,0.15);color:#10b981;border:2px solid rgba(16,185,129,0.3);}
+.mwo-score-circle.med{background:rgba(59,130,246,0.15);color:#60a5fa;border:2px solid rgba(59,130,246,0.3);}
+.mwo-score-circle.low{background:rgba(100,116,139,0.1);color:#94a3b8;border:2px solid rgba(100,116,139,0.2);}
+.mwo-cand-body{flex:1;min-width:0;}
+.mwo-cand-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.mwo-cand-tag{font-size:13px;font-weight:700;color:#fff;}
+.mwo-cand-name{font-size:11px;color:var(--text2);}
+.mwo-cand-reasons{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.mwo-reason-tag{font-size:10.5px;padding:2px 7px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.mwo-forecast-line{font-size:11px;color:#818cf8;font-style:italic;margin-top:4px;}
+/* Parts summary */
+.mwo-parts-table{width:100%;border-collapse:collapse;font-size:12px;}
+.mwo-parts-table th{text-align:left;padding:5px 8px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid var(--border);}
+.mwo-parts-table td{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text);}
+.mwo-in-stock{color:#10b981;font-weight:600;}
+.mwo-no-stock{color:#ef4444;font-weight:600;}
+
+/* ── Risk Cascade Analyzer ── */
+.rca-view{display:none;flex:1;flex-direction:column;background:var(--bg);overflow:hidden;}
+.rca-view.show{display:flex;}
+.rca-header{padding:16px 24px;border-bottom:1px solid var(--border);}
+.rca-header h3{font-size:15px;font-weight:600;color:#fff;}
+.rca-header p{font-size:12px;color:var(--text2);margin-top:2px;}
+.rca-body{display:flex;flex:1;overflow:hidden;}
+.rca-left{width:260px;min-width:260px;border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+.rca-right{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.rca-right::-webkit-scrollbar{width:4px;}
+.rca-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.rca-eq-select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;outline:none;}
+.rca-eq-select:focus{border-color:var(--blue);}
+.rca-run-btn{width:100%;padding:11px;border-radius:10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#ef4444;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.rca-run-btn:hover{background:rgba(239,68,68,0.25);}
+.rca-run-btn:disabled{background:var(--bg3);border-color:var(--border);color:var(--text3);cursor:not-allowed;}
+.rca-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--text3);}
+.rca-placeholder-icon{font-size:40px;opacity:0.4;}
+.rca-placeholder-text{font-size:13px;text-align:center;line-height:1.6;}
+/* Impact banner */
+.rca-impact-banner{background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(249,115,22,0.08));border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:14px 16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;}
+.rca-impact-stat{text-align:center;}
+.rca-impact-val{font-size:20px;font-weight:800;color:#ef4444;line-height:1;}
+.rca-impact-val.direct{color:#ef4444;}
+.rca-impact-val.indirect{color:#f97316;}
+.rca-impact-val.resource{color:#f59e0b;}
+.rca-impact-val.loss{color:#ef4444;font-size:15px;}
+.rca-impact-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);}
+/* Failed node */
+.rca-failed-card{background:rgba(239,68,68,0.08);border:2px solid rgba(239,68,68,0.5);border-radius:10px;padding:12px 14px;}
+.rca-failed-label{font-size:10px;font-weight:600;color:#ef4444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.rca-failed-name{font-size:15px;font-weight:700;color:#fff;}
+.rca-failed-meta{font-size:11.5px;color:var(--text2);margin-top:4px;}
+/* Cascade diagram */
+.rca-diagram{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;overflow-x:auto;}
+.rca-diagram-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;}
+.rca-chain{display:flex;flex-direction:column;gap:6px;}
+.rca-chain-step{display:flex;align-items:center;gap:8px;font-size:12px;}
+.rca-chain-node{padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;white-space:nowrap;}
+.rca-chain-node.failed{background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.4);}
+.rca-chain-node.direct{background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);}
+.rca-chain-node.indirect{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);}
+.rca-chain-node.resource{background:rgba(100,116,139,0.12);color:#94a3b8;border:1px solid rgba(100,116,139,0.2);}
+.rca-chain-arrow{color:var(--text3);font-size:14px;}
+.rca-chain-reason{font-size:11px;color:var(--text2);flex:1;}
+/* Impact cards */
+.rca-section{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.7px;display:flex;align-items:center;gap:6px;}
+.rca-section::after{content:"";flex:1;height:1px;background:var(--border);}
+.rca-impact-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;gap:10px;align-items:flex-start;}
+.rca-impact-card.direct{border-left:3px solid #ef4444;}
+.rca-impact-card.indirect{border-left:3px solid #f97316;}
+.rca-impact-card.resource{border-left:3px solid #64748b;}
+.rca-impact-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;margin-top:2px;}
+.rca-impact-badge.direct{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);}
+.rca-impact-badge.indirect{background:rgba(249,115,22,0.12);color:#f97316;border:1px solid rgba(249,115,22,0.3);}
+.rca-impact-badge.resource{background:rgba(100,116,139,0.1);color:#94a3b8;border:1px solid rgba(100,116,139,0.2);}
+.rca-impact-body{flex:1;}
+.rca-impact-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.rca-impact-tag{font-size:13px;font-weight:700;color:#fff;}
+.rca-impact-name{font-size:11px;color:var(--text2);}
+.rca-impact-reason{font-size:11.5px;color:var(--text2);line-height:1.5;}
+.rca-standby-pill{font-size:10px;color:#10b981;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:2px 7px;margin-top:4px;display:inline-block;}
+/* Mitigations */
+.rca-mitigation{display:flex;gap:8px;font-size:12px;color:var(--text);line-height:1.6;padding:6px 0;border-bottom:1px solid var(--border);}
+.rca-mitigation:last-child{border-bottom:none;}
+.rca-mit-icon{flex-shrink:0;font-size:14px;}
+
+/* ── Carbon Energy Impact Calculator (floating panel) ── */
+.carbon-fab{position:fixed;bottom:88px;right:20px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(16,185,129,0.4);z-index:200;transition:transform 0.2s,box-shadow 0.2s;}
+.carbon-fab:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(16,185,129,0.5);}
+.carbon-panel{position:fixed;bottom:148px;right:20px;width:420px;max-height:72vh;background:var(--bg2);border:1px solid rgba(16,185,129,0.3);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:199;display:none;flex-direction:column;overflow:hidden;}
+.carbon-panel.open{display:flex;}
+.carbon-panel-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.carbon-panel-header h4{font-size:13px;font-weight:600;color:#fff;flex:1;}
+.carbon-panel-close{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;}
+.carbon-panel-close:hover{color:#fff;}
+.carbon-panel-body{overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.carbon-panel-body::-webkit-scrollbar{width:3px;}
+.carbon-panel-body::-webkit-scrollbar-thumb{background:rgba(16,185,129,0.3);border-radius:3px;}
+/* Summary stats */
+.carbon-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.carbon-stat{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;}
+.carbon-stat-val{font-size:18px;font-weight:800;color:#10b981;line-height:1.1;}
+.carbon-stat-val.red{color:#ef4444;}
+.carbon-stat-val.amber{color:#f59e0b;}
+.carbon-stat-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-top:2px;}
+/* Equipment rows */
+.carbon-eq-row{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.carbon-eq-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.carbon-eq-tag{font-size:12px;font-weight:700;color:#fff;}
+.carbon-eq-name{font-size:11px;color:var(--text2);flex:1;}
+.carbon-eq-kwh{font-size:12px;font-weight:600;color:#f59e0b;}
+.carbon-bar-track{height:4px;background:var(--bg2);border-radius:2px;margin-bottom:5px;}
+.carbon-bar-fill{height:4px;border-radius:2px;background:linear-gradient(90deg,#10b981,#f59e0b);}
+.carbon-penalties{display:flex;gap:4px;flex-wrap:wrap;}
+.carbon-pen-pill{font-size:9.5px;padding:2px 6px;border-radius:4px;background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);}
+/* Recommendations */
+.carbon-rec{display:flex;gap:8px;font-size:11.5px;color:var(--text2);line-height:1.6;padding:5px 0;border-bottom:1px solid var(--border);}
+.carbon-rec:last-child{border-bottom:none;}
+.carbon-rec-icon{flex-shrink:0;}
+/* Disclaimer */
+.carbon-disclaimer{font-size:10px;color:var(--text3);line-height:1.5;font-style:italic;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);border-radius:6px;padding:8px 10px;}
+.carbon-section-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <div class="logo-wrap">
+        <div class="logo-icon"><i class="ph-duotone ph-circuitry"></i></div>
+        <div>
+          <div class="logo-text">Plant<span>IQ</span></div>
+          <div class="logo-sub">Knowledge Platform</div>
+        </div>
+        <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" id="stat-chunks">0</div><div class="stat-lbl">Chunks</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-docs">0</div><div class="stat-lbl">Documents</div></div>
+      </div>
+
+      <div class="plant-selector">
+        <div class="plant-selector-label">Plant / Site</div>
+        <select class="plant-select" id="plant-select" onchange="selectPlant(this.value)">
+          <option value="">All Plants</option>
+          <option value="default">Primary Site (Real Documents)</option>
+          <option value="mumbai_demo">Mumbai Plant (Demo)</option>
+          <option value="chennai_demo">Chennai Plant (Demo)</option>
+        </select>
+      </div>
+
+      <div class="lang-selector">
+        <div class="lang-selector-label">Response Language</div>
+        <select class="lang-select" id="lang-select" onchange="selectLanguage(this.value)">
+          <option value="en">🇬🇧 English</option>
+          <option value="hi">हिन्दी Hindi</option>
+          <option value="mr">मराठी Marathi</option>
+          <option value="gu">ગુજરાતી Gujarati</option>
+          <option value="ta">தமிழ் Tamil</option>
+          <option value="te">తెలుగు Telugu</option>
+          <option value="bn">বাংলা Bengali</option>
+          <option value="kn">ಕನ್ನಡ Kannada</option>
+          <option value="ml">മലയാളം Malayalam</option>
+          <option value="pa">ਪੰਜਾਬੀ Punjabi</option>
+        </select>
+      </div>
+
+      <div class="agent-selector">
+        <div class="agent-selector-label">Active Agent</div>
+        <button class="agent-btn active" data-agent="auto" style="--agent-color:#3b82f6" onclick="selectAgent(this)">
+          <span class="agent-icon">🤖</span> Auto (Orchestrator) <span class="agent-dot"></span>
+        </button>
+        <button class="agent-btn" data-agent="knowledge" style="--agent-color:#3b82f6" onclick="selectAgent(this)">
+          <span class="agent-icon">📚</span> Knowledge Copilot <span class="agent-dot"></span>
+        </button>
+        <button class="agent-btn" data-agent="rca" style="--agent-color:#f59e0b" onclick="selectAgent(this)">
+          <span class="agent-icon">🔧</span> Maintenance RCA <span class="agent-dot"></span>
+        </button>
+        <button class="agent-btn" data-agent="compliance" style="--agent-color:#10b981" onclick="selectAgent(this)">
+          <span class="agent-icon">📋</span> Compliance Agent <span class="agent-dot"></span>
+        </button>
+        <button class="agent-btn" data-agent="lessons" style="--agent-color:#8b5cf6" onclick="selectAgent(this)">
+          <span class="agent-icon">🧠</span> Lessons Learned <span class="agent-dot"></span>
+        </button>
+        <button class="agent-btn" data-agent="predictive" style="--agent-color:#ef4444" onclick="selectAgent(this)">
+          <span class="agent-icon">📈</span> Predictive Maint. <span class="agent-dot"></span>
+        </button>
+      </div>
+
+      <div class="sec-label">Upload Documents</div>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt,.md,.xlsx">
+        <div class="upload-icon">📂</div>
+        <div class="upload-text"><strong>Click to upload</strong> or drag & drop<br>PDF · DOCX · XLSX · TXT · MD</div>
+      </div>
+      <div class="upload-progress" id="upload-progress"><div class="upload-progress-bar" id="upload-bar"></div></div>
+
+      <button class="btn btn-primary" onclick="loadDemo()">⚡ Load demo data</button>
+      <button class="btn" onclick="clearChat()">🗑 Clear chat</button>
+      <button class="btn btn-danger" onclick="clearDocs()">🗂 Clear documents</button>
+
+      <div id="doc-list-wrap" style="display:none">
+        <div class="sec-label">Indexed Documents</div>
+        <div id="doc-list"></div>
+      </div>
+    </div>
+    <div class="sidebar-footer">ET AI Hackathon 2026 · PS8</div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div class="topbar-brand">Plant<span>IQ</span></div>
+      <div class="topbar-sep"></div>
+      <div class="topbar-sub">Industrial Intelligence Platform</div>
+      <div class="topbar-right">
+        <button class="graph-tab-btn" id="rca-tab-btn" onclick="toggleRCAView()"><span class="btn-icon">💥</span><span class="btn-label">Cascade</span></button>
+        <button class="graph-tab-btn" id="mwo-tab-btn" onclick="toggleMWOView()"><span class="btn-icon">🔩</span><span class="btn-label">Window</span></button>
+        <button class="graph-tab-btn" id="rdt-tab-btn" onclick="toggleRDTView()"><span class="btn-icon">📅</span><span class="btn-label">Deadlines</span></button>
+        <button class="graph-tab-btn" id="sp-tab-btn" onclick="toggleSPView()"><span class="btn-icon">🔧</span><span class="btn-label">Spares</span></button>
+        <button class="graph-tab-btn" id="ipm-tab-btn" onclick="toggleIPMView()"><span class="btn-icon">🔍</span><span class="btn-label">Incidents</span></button>
+        <button class="graph-tab-btn" id="whatif-tab-btn" onclick="toggleWhatIfView()"><span class="btn-icon">🔮</span><span class="btn-label">What-If</span></button>
+        <button class="graph-tab-btn" id="wo-tab-btn" onclick="toggleWOView()"><span class="btn-icon">⚡</span><span class="btn-label">Priorities</span></button>
+        <button class="graph-tab-btn" id="health-tab-btn" onclick="toggleHealthView()"><span class="btn-icon">💚</span><span class="btn-label">Health</span></button>
+        <button class="graph-tab-btn" id="shift-report-btn" onclick="downloadShiftReport()"><span class="btn-icon">📄</span><span class="btn-label">Report</span></button>
+        <button class="graph-tab-btn" id="graph-tab-btn" onclick="toggleGraphView()"><span class="btn-icon">🕸</span><span class="btn-label">Graph</span></button>
+
+      </div>
+    </div>
+
+    <!-- Mobile agent strip -->
+    <div class="mobile-agent-strip" id="mobile-strip">
+      <div class="mobile-agent-pill active" data-agent="auto" style="--agent-color:#3b82f6" onclick="selectAgentMobile(this)">🤖 Auto</div>
+      <div class="mobile-agent-pill" data-agent="knowledge" style="--agent-color:#3b82f6" onclick="selectAgentMobile(this)">📚 Knowledge</div>
+      <div class="mobile-agent-pill" data-agent="rca" style="--agent-color:#f59e0b" onclick="selectAgentMobile(this)">🔧 RCA</div>
+      <div class="mobile-agent-pill" data-agent="compliance" style="--agent-color:#10b981" onclick="selectAgentMobile(this)">📋 Compliance</div>
+      <div class="mobile-agent-pill" data-agent="lessons" style="--agent-color:#8b5cf6" onclick="selectAgentMobile(this)">🧠 Lessons</div>
+      <div class="mobile-agent-pill" data-agent="predictive" style="--agent-color:#ef4444" onclick="selectAgentMobile(this)">📈 Predictive</div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-wrap" id="chat-wrap">
+      <div class="alert-banner-wrap" id="alert-banner-wrap" style="display:none"></div>
+      <div class="chat-inner" id="chat-inner">
+        <div class="empty" id="empty-state">
+          <div class="empty-logo"><i class="ph-duotone ph-circuitry"></i></div>
+          <h2>PlantIQ Copilot</h2>
+          <p>Your plant's institutional knowledge, one question away.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graph View -->
+    <div class="graph-view" id="graph-view">
+      <div class="graph-header">
+        <div>
+          <h3>🕸 Industrial Knowledge Graph</h3>
+          <p>Equipment · Documents · Incidents · Regulations · Spare Parts · CAPAs</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="graph-tab-btn" onclick="showPIDPanel()" id="pid-btn"><span class="btn-icon">📐</span><span class="btn-label">P&amp;ID</span></button>
+          <button class="graph-tab-btn" onclick="hidePIDPanel()" id="pid-close-btn" style="display:none"><span class="btn-icon">✕</span><span class="btn-label">Close</span></button>
+        </div>
+        <div class="graph-stats">
+          <div class="graph-stat">Nodes: <span id="gstat-nodes">–</span></div>
+          <div class="graph-stat">Edges: <span id="gstat-edges">–</span></div>
+        </div>
+      </div>
+      <div class="graph-canvas-wrap">
+        <canvas id="graph-canvas"></canvas>
+        <div class="graph-legend" id="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Equipment</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Document</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Incident</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Regulation</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Spare Part</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>CAPA</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Finding</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#6b7280"></div>Location</div>
+        </div>
+        <div class="critical-panel" id="critical-panel">
+          <h4>⚠️ High Risk Equipment</h4>
+          <div id="critical-list">Loading...</div>
+        </div>
+        <div class="node-tooltip" id="node-tooltip"></div>
+      <div class="pid-panel" id="pid-panel">
+        <div class="pid-split">
+          <div class="pid-image-wrap" id="pid-image-wrap">
+            <div style="text-align:center;padding:30px 20px">
+              <div style="font-size:36px;margin-bottom:10px">📐</div>
+              <div style="font-size:15px;font-weight:500;color:#fff;margin-bottom:6px">P&ID Intelligence Parser</div>
+              <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6">Gemini Vision extracts equipment tags,<br>instruments and process connections</div>
+              <button class="pid-upload-btn" onclick="parseDemoPID()">⚡ Parse Demo CDU P&ID</button>
+              <div style="font-size:11px;color:var(--text3);margin:8px 0">or upload your own</div>
+              <label style="cursor:pointer">
+                <input type="file" id="pid-file" accept=".svg,.png,.jpg,.jpeg" style="display:none" onchange="uploadPID(this)">
+                <span class="pid-upload-btn sec">📂 Upload P&ID</span>
+              </label>
+              <div id="pid-status" style="font-size:12px;color:var(--text2);margin-top:12px"></div>
+            </div>
+          </div>
+          <div class="pid-results" id="pid-results">
+            <div style="color:var(--text3);font-size:13px;text-align:center;margin-top:40px">Parse a P&ID to see extracted entities here</div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Health Dashboard View -->
+    <div class="graph-view" id="health-view">
+      <div class="graph-header">
+        <div>
+          <h3>💚 Equipment Health Dashboard</h3>
+          <p>Live computed health scores, worst equipment first</p>
+        </div>
+        <div class="graph-stats">
+          <div class="graph-stat">Equipment: <span id="hstat-count">–</span></div>
+          <div class="graph-stat">Avg Health: <span id="hstat-avg">–</span></div>
+        </div>
+      </div>
+      <div class="health-grid-wrap" id="health-grid-wrap">
+        <div style="color:var(--text3);font-size:13px;text-align:center;margin-top:40px;grid-column:1/-1">Loading health scores...</div>
+      </div>
+    </div>
+
+    <!-- Risk Cascade Analyzer View -->
+    <div class="rca-view" id="rca-view">
+      <div class="rca-header">
+        <h3>💥 Risk Cascade Analyzer</h3>
+        <p>Simulate equipment failure and trace direct, indirect, and resource cascade effects across the plant</p>
+      </div>
+      <div class="rca-body">
+        <div class="rca-left">
+          <div>
+            <div class="wi-section-label" style="margin-bottom:6px">Equipment to Fail</div>
+            <select class="rca-eq-select" id="rca-eq-select">
+              <option value="">Choose equipment...</option>
+            </select>
+          </div>
+          <button class="rca-run-btn" id="rca-run-btn" onclick="runRCAAnalysis()">💥 Analyze Cascade</button>
+        </div>
+        <div class="rca-right" id="rca-right">
+          <div class="rca-placeholder">
+            <div class="rca-placeholder-icon">💥</div>
+            <div class="rca-placeholder-text">Select equipment and click<br><strong>Analyze Cascade</strong> to simulate<br>failure and trace all knock-on effects.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Maintenance Window Optimizer View -->
+    <div class="mwo-view" id="mwo-view">
+      <div class="mwo-header">
+        <h3>🔩 Maintenance Window Optimizer</h3>
+        <p>Select primary equipment for shutdown and find what else to service simultaneously to minimize total plant downtime</p>
+      </div>
+      <div class="mwo-body">
+        <div class="mwo-left">
+          <div>
+            <div class="wi-section-label" style="margin-bottom:6px">Primary Equipment to Shut Down</div>
+            <select class="mwo-eq-select" id="mwo-eq-select">
+              <option value="">Choose equipment...</option>
+            </select>
+          </div>
+          <button class="mwo-plan-btn" id="mwo-plan-btn" onclick="runMWOPlan()">🔩 Optimize Window</button>
+        </div>
+        <div class="mwo-right" id="mwo-right">
+          <div class="mwo-placeholder">
+            <div class="mwo-placeholder-icon">🔩</div>
+            <div class="mwo-placeholder-text">Select equipment requiring shutdown,<br>then click <strong>Optimize Window</strong> to see<br>co-maintenance recommendations.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regulatory Deadline Tracker View -->
+    <div class="rdt-view" id="rdt-view">
+      <div class="rdt-header">
+        <div class="rdt-header-text">
+          <h3>📅 Regulatory Deadline Tracker</h3>
+          <p>All compliance findings and inspection deadlines, sorted by urgency</p>
+        </div>
+        <div class="rdt-stats">
+          <div class="rdt-stat"><span class="rdt-stat-val" id="rdtstat-overdue" style="color:#ef4444">–</span><span class="rdt-stat-label">Overdue</span></div>
+          <div class="rdt-stat"><span class="rdt-stat-val" id="rdtstat-soon" style="color:#f59e0b">–</span><span class="rdt-stat-label">Due Soon</span></div>
+          <div class="rdt-stat"><span class="rdt-stat-val" id="rdtstat-upcoming" style="color:#60a5fa">–</span><span class="rdt-stat-label">Upcoming</span></div>
+          <div class="rdt-stat"><span class="rdt-stat-val" id="rdtstat-done" style="color:#10b981">–</span><span class="rdt-stat-label">Completed</span></div>
+        </div>
+      </div>
+      <div class="rdt-body" id="rdt-body">
+        <div class="rdt-empty">Loading deadlines...</div>
+      </div>
+    </div>
+
+    <!-- Spare Parts Gap Analyzer View -->
+    <div class="sp-view" id="sp-view">
+      <div class="sp-header">
+        <div class="sp-header-text">
+          <h3>🔧 Spare Parts Gap Analyzer</h3>
+          <p>Stock gaps vs critical equipment risk. Financial exposure if equipment fails without spares</p>
+        </div>
+        <div class="sp-stats">
+          <div class="sp-stat"><span class="sp-stat-val" id="spstat-parts">–</span><span class="sp-stat-label">Total Parts</span></div>
+          <div class="sp-stat"><span class="sp-stat-val" id="spstat-gaps" style="color:#ef4444">–</span><span class="sp-stat-label">Gaps</span></div>
+          <div class="sp-stat"><span class="sp-stat-val" id="spstat-critical" style="color:#ef4444">–</span><span class="sp-stat-label">Critical Gaps</span></div>
+          <div class="sp-stat"><span class="sp-stat-val" id="spstat-exposure" style="color:#ef4444">–</span><span class="sp-stat-label">Exposure (INR L)</span></div>
+        </div>
+      </div>
+      <div class="sp-body" id="sp-body">
+        <div class="sp-placeholder">Loading spare parts data...</div>
+      </div>
+    </div>
+
+    <!-- Incident Pattern Matcher View -->
+    <div class="ipm-view" id="ipm-view">
+      <div class="ipm-header">
+        <div>
+          <h3>🔍 Incident Pattern Matcher</h3>
+          <p>Describe symptoms to find similar historical incidents, root causes, and what fixed them</p>
+        </div>
+      </div>
+      <div class="ipm-body">
+        <!-- Controls -->
+        <div class="ipm-controls">
+          <div>
+            <div class="wi-section-label" style="margin-bottom:6px">Describe Symptoms</div>
+            <textarea class="ipm-textarea" id="ipm-query" placeholder="e.g. bearing temperature rising, oil iron content high, vibration stable..."></textarea>
+          </div>
+          <div>
+            <div class="ipm-chips-label" style="margin-bottom:8px">Quick Add Symptoms</div>
+            <div class="ipm-chips" id="ipm-chips">
+              <div style="color:var(--text3);font-size:11px">Loading...</div>
+            </div>
+          </div>
+          <button class="ipm-search-btn" id="ipm-search-btn" onclick="runIPMSearch()">🔍 Find Similar Incidents</button>
+          <button class="ipm-clear-btn" onclick="clearIPM()">↺ Clear</button>
+        </div>
+        <!-- Results -->
+        <div class="ipm-results" id="ipm-results">
+          <div class="ipm-placeholder">
+            <div class="ipm-placeholder-icon">🔍</div>
+            <div class="ipm-placeholder-text">Describe the symptoms you are seeing,<br>then click <strong>Find Similar Incidents</strong><br>to see matching historical cases.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- What-If Simulator View -->
+    <div class="whatif-view" id="whatif-view">
+      <div class="whatif-header">
+        <div>
+          <h3>🔮 What-If Scenario Simulator</h3>
+          <p>Adjust sensor readings or defer maintenance to see projected risk, health score, forecast and cascade impact instantly</p>
+        </div>
+      </div>
+      <div class="whatif-body">
+        <!-- Controls -->
+        <div class="whatif-controls" id="wi-controls">
+          <div>
+            <div class="wi-section-label">Select Equipment</div>
+            <select class="wi-eq-select" id="wi-eq-select" onchange="loadWIEquipment(this.value)">
+              <option value="">Choose equipment...</option>
+            </select>
+          </div>
+          <div id="wi-params-area">
+            <div style="color:var(--text3);font-size:12px;text-align:center;margin-top:8px">Select equipment to see parameters</div>
+          </div>
+        </div>
+        <!-- Results -->
+        <div class="whatif-results" id="wi-results">
+          <div class="wi-placeholder">
+            <div class="wi-placeholder-icon">🔮</div>
+            <div class="wi-placeholder-text">Select equipment and adjust parameters,<br>then click <strong>Run Simulation</strong> to see projected impact.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Work Order Priority View -->
+    <div class="wo-view" id="wo-view">
+      <div class="wo-header">
+        <div>
+          <h3>⚡ Maintenance Work Order Priorities</h3>
+          <p>Ranked by composite urgency score across risk, degradation, compliance, overdue WOs, and H2S service</p>
+        </div>
+        <div class="wo-stats">
+          <div class="wo-stat">Actions: <span id="wostat-count">–</span></div>
+          <div class="wo-stat">Immediate: <span id="wostat-immediate" style="color:#ef4444">–</span></div>
+          <div class="wo-stat">This Shift: <span id="wostat-shift" style="color:#f59e0b">–</span></div>
+        </div>
+      </div>
+      <div class="wo-list" id="wo-list">
+        <div class="wo-empty">Loading priorities...</div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea class="input-box" id="input-box" placeholder="Ask about your plant..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="mic-btn hands-free-btn" id="hands-free-btn" onclick="toggleHandsFree()" title="Hands-free voice mode">🎧</button>
+        <button class="mic-btn" id="mic-btn" onclick="toggleVoiceInput()" title="Voice input">🎤</button>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+      </div>
+      <div class="input-hint" id="input-hint">Enter to send · Shift+Enter for new line</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let isThinking = false;
+let selectedAgent = 'auto';
+let selectedPlant = '';  // '' = All Plants (default, matches current/original behavior)
+let selectedLanguage = 'en';  // 'en' = English (default, matches current/original behavior)
+let handsFreeMode = false;  // when true, chains voice input -> answer -> read aloud -> listen again
+
+function toggleHandsFree() {
+  handsFreeMode = !handsFreeMode;
+  const btn = document.getElementById('hands-free-btn');
+  const hint = document.getElementById('input-hint');
+  if (handsFreeMode) {
+    btn.classList.add('hands-free-active');
+    hint.textContent = 'Hands-free mode is on. Speak your question, the answer will be read aloud automatically, then listening restarts. Click the headset icon to stop.';
+    showToast('Hands-free mode on. Tap the headset icon anytime to stop.');
+    toggleVoiceInput();
+  } else {
+    btn.classList.remove('hands-free-active');
+    hint.textContent = 'Enter to send · Shift+Enter for new line';
+    showToast('Hands-free mode off.');
+    // Safety stop: cancel any in-progress listening or audio playback immediately
+    if (isListening && recognition) recognition.stop();
+    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+    if (currentSpeakBtn) resetSpeakBtn(currentSpeakBtn);
+  }
+}
+
+function selectPlant(value) {
+  selectedPlant = value;
+  showToast(value === '' ? 'Searching all plants' : `Filtered to: ${document.getElementById('plant-select').selectedOptions[0].text}`);
+}
+
+const SPEECH_LANG_MAP = {
+  en: 'en-IN', hi: 'hi-IN', mr: 'mr-IN', gu: 'gu-IN', ta: 'ta-IN',
+  te: 'te-IN', bn: 'bn-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN'
+};
+
+function selectLanguage(value) {
+  selectedLanguage = value;
+  const label = document.getElementById('lang-select').selectedOptions[0].text;
+  showToast(`Response language: ${label}`);
+}
+
+// Voice Input (Web Speech API SpeechRecognition)
+let recognition = null;
+let isListening = false;
+
+function initSpeechRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    document.getElementById('mic-btn').style.display = 'none';
+    return null;
+  }
+  const r = new SR();
+  r.continuous = false;
+  r.interimResults = false;
+  r.maxAlternatives = 1;
+  return r;
+}
+
+function toggleVoiceInput() {
+  if (isListening) {
+    if (recognition) recognition.stop();
+    return;
+  }
+  recognition = initSpeechRecognition();
+  if (!recognition) {
+    showToast('Voice input is not supported in this browser. Try Chrome or Edge.');
+    return;
+  }
+
+  recognition.lang = SPEECH_LANG_MAP[selectedLanguage] || 'en-IN';
+
+  const micBtn = document.getElementById('mic-btn');
+  const box = document.getElementById('input-box');
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add('listening');
+    micBtn.textContent = '⏹';
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    box.value = transcript;
+    autoResize(box);
+    box.focus();
+    if (handsFreeMode && transcript.trim()) {
+      sendMessage();
+    }
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === 'not-allowed') {
+      showToast('Microphone access denied. Please allow microphone permission.');
+    } else if (event.error !== 'aborted' && event.error !== 'no-speech') {
+      showToast('Voice input error: ' + event.error);
+    }
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '🎤';
+  };
+
+  try {
+    recognition.start();
+  } catch (e) {
+    showToast('Could not start voice input. Please try again.');
+  }
+}
+
+// Voice Output (Web Speech API SpeechSynthesis)
+let currentAudio = null;
+let currentSpeakBtn = null;
+
+function stripForSpeech(text) {
+  // Remove the entire trailing SOURCES section (citations are now consolidated
+  // at the end rather than inline, keep it visible in the chat bubble but skip
+  // it entirely when reading aloud since a list of filenames isn't useful to hear)
+  let cleaned = text.replace(/\n?\s*SOURCES\s*\n[\s\S]*$/i, '');
+  // Legacy safety net: strip any old-style inline tags too, in case a response
+  // ever includes them despite the prompt instruction
+  return cleaned
+    .replace(/\[Source:[^\]]*\]/gi, '')
+    .replace(/\[Knowledge Graph\]/gi, '')
+    .replace(/\*\*/g, '')
+    .replace(/[#*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function handleSpeakClick(btn) {
+  const answerEl = document.getElementById(btn.dataset.answerId);
+  const rawText = answerEl ? answerEl.dataset.rawAnswer : '';
+  const lang = btn.dataset.lang || 'en';
+  toggleSpeak(btn, rawText, lang);
+}
+
+function resetSpeakBtn(btn) {
+  btn.classList.remove('speaking', 'loading');
+  btn.innerHTML = '🔊 Read aloud';
+}
+
+async function toggleSpeak(btn, rawText, lang) {
+  // If this exact button is currently playing or loading, stop/cancel it
+  if (btn.classList.contains('speaking') || btn.classList.contains('loading')) {
+    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+    resetSpeakBtn(btn);
+    currentAudio = null;
+    currentSpeakBtn = null;
+    return;
+  }
+
+  // Stop any other audio currently playing first
+  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+  if (currentSpeakBtn) resetSpeakBtn(currentSpeakBtn);
+
+  btn.classList.add('loading');
+  btn.innerHTML = '⏳ Loading...';
+
+  try {
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text: stripForSpeech(rawText), language: lang}),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      showToast(err.error || 'Could not generate audio.');
+      resetSpeakBtn(btn);
+      return;
+    }
+
+    const blob = await res.blob();
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+
+    currentAudio = audio;
+    currentSpeakBtn = btn;
+
+    btn.classList.remove('loading');
+    btn.classList.add('speaking');
+    btn.innerHTML = '⏹ Stop';
+
+    audio.onended = () => {
+      resetSpeakBtn(btn); currentAudio = null; currentSpeakBtn = null; URL.revokeObjectURL(audioUrl);
+      if (handsFreeMode) {
+        setTimeout(() => toggleVoiceInput(), 500);
+      }
+    };
+    audio.onerror = () => { resetSpeakBtn(btn); currentAudio = null; currentSpeakBtn = null; showToast('Playback error.'); };
+
+    audio.play();
+  } catch (e) {
+    showToast('Could not reach the server for voice output.');
+    resetSpeakBtn(btn);
+  }
+}
+
+const AGENT_COLORS = {
+  auto:'#3b82f6', knowledge:'#3b82f6', rca:'#f59e0b',
+  compliance:'#10b981', lessons:'#8b5cf6', predictive:'#ef4444'
+};
+const AGENT_LABELS = {
+  auto:'🤖 Auto Mode', knowledge:'📚 Knowledge Copilot', rca:'🔧 Maintenance RCA',
+  compliance:'📋 Compliance Agent', lessons:'🧠 Lessons Learned', predictive:'📈 Predictive Maint.'
+};
+const AGENT_NAMES = {
+  knowledge:'Knowledge Copilot', rca:'Maintenance RCA', compliance:'Compliance Agent',
+  lessons:'Lessons Learned', predictive:'Predictive Maint.'
+};
+
+document.addEventListener('DOMContentLoaded', () => { loadStats(); loadAlerts(); });
+
+// ── Proactive alerts ──────────────────────────────────────────────────────────
+async function loadAlerts() {
+  try {
+    const r = await fetch('/api/alerts');
+    const d = await r.json();
+    const wrap = document.getElementById('alert-banner-wrap');
+    if (!d.alerts || d.alerts.length === 0) { wrap.style.display = 'none'; return; }
+
+    wrap.innerHTML = d.alerts.map(a => {
+      const isCritical = a.risk_level === 'CRITICAL';
+      const cls = isCritical ? '' : 'medium';
+      const icon = isCritical ? '🔴' : '🟠';
+      const isComputed = a.risk_source === 'computed_from_telemetry';
+      const sourceBadge = isComputed
+        ? `<span class="risk-source-badge computed" title="Risk level calculated live from sensor thresholds, not a fixed label">🔬 Computed from live sensor data</span>`
+        : `<span class="risk-source-badge static" title="Risk level set from equipment classification, no live sensor telemetry for this asset">📌 Static classification</span>`;
+      return `<div class="alert-banner ${cls}" onclick="askAboutAlert('${a.tag}')">
+        <span class="alert-banner-icon">${icon}</span>
+        <div class="alert-banner-body">
+          <div class="alert-banner-title"><span class="alert-banner-tag">${escHtml(a.tag)}</span>${escHtml(a.name)}, ${escHtml(a.risk_level)} risk</div>
+          <div class="alert-banner-text">${escHtml(a.alert)}</div>
+          ${sourceBadge}
+        </div>
+      </div>`;
+    }).join('');
+    wrap.style.display = 'flex';
+  } catch(e) { /* alerts are non-critical to page function, fail silently */ }
+}
+
+function askAboutAlert(tag) {
+  document.getElementById('input-box').value = `What is the current status and recommended action for ${tag}?`;
+  sendMessage();
+}
+
+// ── Sidebar mobile ────────────────────────────────────────────────────────────
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ── Agent selector ────────────────────────────────────────────────────────────
+function selectAgent(btn) {
+  document.querySelectorAll('.agent-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedAgent = btn.getAttribute('data-agent');
+  updateAgentUI();
+  closeSidebar();
+}
+
+function selectAgentMobile(pill) {
+  document.querySelectorAll('.mobile-agent-pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  selectedAgent = pill.getAttribute('data-agent');
+  // Sync sidebar buttons too
+  document.querySelectorAll('.agent-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-agent') === selectedAgent);
+  });
+  updateAgentUI();
+}
+
+function updateAgentUI() {
+  const color = AGENT_COLORS[selectedAgent] || '#3b82f6';
+  const topbar = document.getElementById('topbar-agent');
+  if (topbar) {
+    topbar.textContent = AGENT_LABELS[selectedAgent] || selectedAgent;
+    topbar.style.background = hexToRgba(color, 0.1);
+    topbar.style.borderColor = hexToRgba(color, 0.3);
+    topbar.style.color = color;
+  }
+  const box = document.getElementById('input-box');
+  box.placeholder = selectedAgent === 'auto'
+    ? 'Ask about your plant...'
+    : `Ask the ${AGENT_LABELS[selectedAgent]}...`;
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const r = await fetch('/api/stats');
+    const d = await r.json();
+    document.getElementById('stat-chunks').textContent = d.chunks;
+    document.getElementById('stat-docs').textContent = d.documents;
+    const wrap = document.getElementById('doc-list-wrap');
+    const list = document.getElementById('doc-list');
+    if (d.sources && d.sources.length > 0) {
+      wrap.style.display = 'block';
+      list.innerHTML = d.sources.map(s =>
+        `<div class="doc-item"><span class="doc-dot"></span><span class="doc-name" title="${s}">${s}</span></div>`
+      ).join('');
+    } else { wrap.style.display = 'none'; }
+  } catch(e) {}
+}
+
+// ── Send ──────────────────────────────────────────────────────────────────────
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+function sendChip(el) {
+  const text = el.textContent.replace(/^[^\w⚠️]+/, '').replace(/^[⚠️🔧📚📋📈🧠]+\s*/, '').trim();
+  document.getElementById('input-box').value = text;
+  sendMessage();
+}
+
+// ── Error display helper ────────────────────────────────────────────────────
+const ERROR_DISPLAY = {
+  rate_limit:    { icon: '⏳', label: 'Service busy',      retryHint: 'Try again in a moment.' },
+  config_error:  { icon: '⚙️', label: 'Configuration issue', retryHint: '' },
+  network_error: { icon: '📡', label: 'Connection issue',  retryHint: 'Check your network and try again.' },
+  timeout:       { icon: '⏱️', label: 'Request timed out', retryHint: 'Try again.' },
+  no_documents:  { icon: '📂', label: 'No documents loaded', retryHint: 'Load demo data or upload documents first.' },
+  empty_question:{ icon: '✍️', label: 'No question',       retryHint: '' },
+  unknown_error: { icon: '⚠️', label: 'Something went wrong', retryHint: 'Please try again.' },
+};
+
+function renderErrorBubble(errorMsg, errorType) {
+  const meta = ERROR_DISPLAY[errorType] || ERROR_DISPLAY.unknown_error;
+  const hint = meta.retryHint ? `\n${meta.retryHint}` : '';
+  const text = `${meta.icon} **${meta.label}**\n${errorMsg}${hint}`;
+  appendBotBubble(text, 'LOW', [], 'knowledge', '📚', '#3b82f6');
+}
+
+async function sendMessage() {
+  const box = document.getElementById('input-box');
+  const question = box.value.trim();
+  if (!question || isThinking) return;
+  box.value = ''; box.style.height = 'auto';
+  isThinking = true;
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('empty-state').style.display = 'none';
+
+  appendUserBubble(question);
+  const thinkId = 'think-' + Date.now();
+  appendThinking(thinkId);
+  scrollBottom();
+
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({question, agent: selectedAgent, top_k: 5, plant_id: selectedPlant || null, language: selectedLanguage}),
+    });
+    const data = await res.json();
+    document.getElementById(thinkId)?.remove();
+    if (data.error) {
+      renderErrorBubble(data.error, data.error_type);
+    } else {
+      const speakBtn = appendBotBubble(data.answer, data.confidence, data.sources || [], data.agent_key, data.agent_icon, data.agent_color, data.language || 'en');
+      if (handsFreeMode && speakBtn) {
+        setTimeout(() => handleSpeakClick(speakBtn), 300);
+      }
+    }
+  } catch(e) {
+    document.getElementById(thinkId)?.remove();
+    renderErrorBubble('Could not reach the PlantIQ server. Make sure it is running.', 'network_error');
+  }
+  isThinking = false;
+  document.getElementById('send-btn').disabled = false;
+  scrollBottom();
+  box.focus();
+}
+
+// ── DOM helpers ───────────────────────────────────────────────────────────────
+function appendUserBubble(text) {
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `<div class="msg-user"><div class="bubble-user">${escHtml(text)}</div></div>`;
+  document.getElementById('chat-inner').appendChild(div);
+}
+
+function appendThinking(id) {
+  const div = document.createElement('div');
+  div.className = 'thinking'; div.id = id;
+  div.innerHTML = `<div class="bot-av" style="background:linear-gradient(135deg,#1e3a6e,var(--blue))"><i class="ph-duotone ph-circuitry"></i></div>
+    <div class="thinking-dots"><span></span><span></span><span></span></div>`;
+  document.getElementById('chat-inner').appendChild(div);
+}
+
+function appendBotBubble(answer, confidence, sources, agentKey, agentIcon, agentColor, language) {
+  language = language || 'en';
+  const conf = (confidence || 'LOW').toUpperCase();
+  const badgeCls = conf==='HIGH'?'badge-high':conf==='MEDIUM'?'badge-medium':'badge-low';
+  const confIcon = conf==='HIGH'?'✦':conf==='MEDIUM'?'◈':'◇';
+  const color = agentColor || '#3b82f6';
+  const agentLabel = AGENT_NAMES[agentKey] || 'Knowledge Copilot';
+
+  const srcNames = [...new Set(sources.map(s => s.file))];
+  const srcBadges = srcNames.map(n =>
+    `<span class="badge badge-src" data-file="${n}" onclick="toggleSrc(this)">📄 ${n.length > 20 ? n.substring(0,18)+'…' : n}</span>`
+  ).join('');
+
+  const srcDrawerId = 'src-' + Date.now();
+  const srcItems = sources.map((s, i) => {
+    const barW = Math.min(Math.round(s.score), 100);
+    return `<div class="src-item" data-file="${s.file}">
+      <div class="src-item-head">
+        <span class="src-item-name">[${i+1}] ${escHtml(s.file)}</span>
+        <span class="src-item-loc">${escHtml(s.location)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0 8px">
+        <div class="src-bar-wrap" style="flex:1;margin:0"><div class="src-bar" style="width:${barW}%"></div></div>
+        <span style="font-size:11px;color:var(--blue);font-weight:600;min-width:36px;text-align:right">${barW}%</span>
+      </div>
+      <div class="src-text">${escHtml(s.text)}${s.text.length>=400?'…':''}</div>
+    </div>`;
+  }).join('');
+
+  const srcDrawer = sources.length > 0 ? `
+    <div class="src-drawer" id="${srcDrawerId}">
+      <div class="src-drawer-head">📄 ${sources.length} source excerpt${sources.length>1?'s':''} retrieved</div>
+      ${srcItems}
+    </div>` : '';
+
+  const div = document.createElement('div');
+  div.className = 'msg';
+  const answerId = 'ans-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+  div.innerHTML = `
+    <div class="msg-bot">
+      <div class="bot-av" style="background:linear-gradient(135deg,${hexDarken(color)},${color})">${agentIcon||'<i class="ph-duotone ph-circuitry"></i>'}</div>
+      <div class="bot-content">
+        <div class="bubble-bot" id="${answerId}">${formatAnswer(answer)}</div>
+        <div class="msg-meta">
+          <span class="badge ${badgeCls}">${confIcon} ${conf}</span>
+          <span class="badge-agent" style="background:${hexToRgba(color,0.12)};color:${color};border:1px solid ${hexToRgba(color,0.3)}">${agentIcon} ${agentLabel}</span>
+          <button class="speak-btn" data-answer-id="${answerId}" data-lang="${language}" onclick="handleSpeakClick(this)">🔊 Read aloud</button>
+          ${srcBadges}
+        </div>
+        ${srcDrawer}
+      </div>
+    </div>`;
+  div.querySelector(`#${answerId}`).dataset.rawAnswer = answer;
+  document.getElementById('chat-inner').appendChild(div);
+  return div.querySelector('.speak-btn');
+}
+
+function toggleSrc(badge) {
+  const botContent = badge.closest('.bot-content');
+  const drawer = botContent.querySelector('.src-drawer');
+  if (!drawer) return;
+  const allBadges = [...botContent.querySelectorAll('.badge-src')];
+  const isActive = badge.classList.contains('active-badge');
+  const fileName = badge.getAttribute('data-file');
+  allBadges.forEach(b => b.classList.remove('active-badge'));
+  if (isActive) {
+    drawer.classList.remove('open');
+    drawer.querySelectorAll('.src-item').forEach(item => item.style.display = '');
+  } else {
+    badge.classList.add('active-badge');
+    drawer.querySelectorAll('.src-item').forEach(item => {
+      item.style.display = item.getAttribute('data-file') === fileName ? '' : 'none';
+    });
+    const visCount = drawer.querySelectorAll('.src-item:not([style*="none"])').length;
+    const head = drawer.querySelector('.src-drawer-head');
+    if (head) head.textContent = `📄 ${visCount} excerpt${visCount>1?'s':''} from ${fileName}`;
+    drawer.classList.add('open');
+  }
+}
+
+function formatAnswer(text) {
+  return escHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code style="background:#1a2744;padding:1px 5px;border-radius:4px;font-size:12px">$1</code>')
+    .replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')
+    .replace(/^/, '<p>').replace(/$/, '</p>');
+}
+function escHtml(t) {
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function hexDarken(hex) {
+  const r=Math.max(0,parseInt(hex.slice(1,3),16)-60);
+  const g=Math.max(0,parseInt(hex.slice(3,5),16)-60);
+  const b=Math.max(0,parseInt(hex.slice(5,7),16)-60);
+  return `rgb(${r},${g},${b})`;
+}
+function hexToRgba(hex, alpha) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+function scrollBottom() {
+  const w = document.getElementById('chat-wrap');
+  setTimeout(() => w.scrollTop = w.scrollHeight, 50);
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+async function loadDemo() {
+  showToast('⚡ Loading demo documents...', '');
+  try {
+    await fetch('/api/load-demo', {method:'POST'});
+    await loadStats();
+    showToast('✓ Demo documents loaded!', 'success');
+  } catch(e) { showToast('❌ Error loading demo data', 'error'); }
+}
+async function clearChat() {
+  await fetch('/api/clear', {method:'POST'});
+  const inner = document.getElementById('chat-inner');
+  [...inner.children].forEach(c => { if(c.id !== 'empty-state') c.remove(); });
+  document.getElementById('empty-state').style.display = 'flex';
+  showToast('Chat cleared', '');
+}
+async function clearDocs() {
+  if (!confirm('Delete all indexed documents?')) return;
+  try {
+    await fetch('/api/clear-docs', {method:'POST'});
+    document.getElementById('stat-chunks').textContent = '0';
+    document.getElementById('stat-docs').textContent = '0';
+    document.getElementById('doc-list').innerHTML = '';
+    document.getElementById('doc-list-wrap').style.display = 'none';
+    showToast('✓ Documents cleared', 'success');
+  } catch(e) { showToast('❌ Error clearing documents', 'error'); }
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+document.getElementById('file-input').addEventListener('change', async function() {
+  const files = [...this.files];
+  if (!files.length) return;
+  const prog = document.getElementById('upload-progress');
+  const bar = document.getElementById('upload-bar');
+  prog.style.display = 'block'; bar.style.width = '10%';
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    bar.style.width = ((i+1)/files.length*90) + '%';
+    const fd = new FormData(); fd.append('file', f);
+    try {
+      const r = await fetch('/api/upload', {method:'POST', body:fd});
+      const d = await r.json();
+      if (d.success) showToast(`✓ ${f.name}: ${d.chunks_added} chunks`, 'success');
+      else showToast(`❌ ${f.name}: ${d.error}`, 'error');
+    } catch(e) { showToast(`❌ Upload failed`, 'error'); }
+  }
+  bar.style.width = '100%';
+  setTimeout(() => { prog.style.display = 'none'; bar.style.width = '0'; }, 600);
+  await loadStats();
+  this.value = '';
+});
+
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag');
+  const dt = new DataTransfer();
+  [...e.dataTransfer.files].forEach(f => dt.items.add(f));
+  document.getElementById('file-input').files = dt.files;
+  document.getElementById('file-input').dispatchEvent(new Event('change'));
+});
+
+// ── P&ID Parser ──────────────────────────────────────────────────────────────
+function showPIDPanel() {
+  document.getElementById('pid-panel').classList.add('show');
+  document.getElementById('pid-btn').style.display = 'none';
+  document.getElementById('pid-close-btn').style.display = '';
+  // Hide graph canvas + legend + critical panel
+  document.getElementById('graph-canvas').style.display = 'none';
+  document.getElementById('graph-legend').style.display = 'none';
+  document.getElementById('critical-panel').style.display = 'none';
+}
+function hidePIDPanel() {
+  document.getElementById('pid-panel').classList.remove('show');
+  document.getElementById('pid-btn').style.display = '';
+  document.getElementById('pid-close-btn').style.display = 'none';
+  document.getElementById('graph-canvas').style.display = '';
+  document.getElementById('graph-legend').style.display = '';
+  document.getElementById('critical-panel').style.display = '';
+}
+
+async function parseDemoPID() {
+  document.getElementById('pid-status').textContent = '⏳ Sending to Gemini Vision...';
+  document.getElementById('pid-status').style.color = 'var(--text2)';
+  // Show the demo SVG
+  const imgWrap = document.getElementById('pid-image-wrap');
+  imgWrap.innerHTML = `<div style="text-align:center;width:100%">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">CDU P&ID | Vadodara Refinery</div>
+    <img src="/api/pid/demo" style="max-width:100%;border:1px solid var(--border);border-radius:8px;background:#f8f9fa">
+    <div id="pid-status" style="font-size:12px;color:var(--text2);margin-top:10px">⏳ Sending to Gemini Vision...</div>
+  </div>`;
+  try {
+    const res = await fetch('/api/pid/parse', {method:'POST'});
+    const data = await res.json();
+    if (data.error) {
+      document.getElementById('pid-status').textContent = '❌ ' + data.error;
+      document.getElementById('pid-status').style.color = 'var(--red)';
+      return;
+    }
+    document.getElementById('pid-status').textContent = '✓ Extraction complete. Knowledge graph updated!';
+    document.getElementById('pid-status').style.color = 'var(--green)';
+    renderPIDResults(data);
+  } catch(e) {
+    document.getElementById('pid-status').textContent = '❌ Error: ' + e.message;
+  }
+}
+
+async function uploadPID(input) {
+  if (!input.files[0]) return;
+  const file = input.files[0];
+  const imgWrap = document.getElementById('pid-image-wrap');
+  const url = URL.createObjectURL(file);
+  imgWrap.innerHTML = `<div style="text-align:center;width:100%">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">${file.name}</div>
+    <img src="${url}" style="max-width:100%;border:1px solid var(--border);border-radius:8px;background:#f8f9fa">
+    <div id="pid-status" style="font-size:12px;color:var(--text2);margin-top:10px">⏳ Sending to Gemini Vision...</div>
+  </div>`;
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    const res = await fetch('/api/pid/parse', {method:'POST', body:fd});
+    const data = await res.json();
+    if (data.error) {
+      document.getElementById('pid-status').textContent = '❌ ' + data.error;
+      return;
+    }
+    document.getElementById('pid-status').textContent = '✓ Extraction complete. Knowledge graph updated!';
+    document.getElementById('pid-status').style.color = 'var(--green)';
+    renderPIDResults(data);
+  } catch(e) {
+    document.getElementById('pid-status').textContent = '❌ Error: ' + e.message;
+  }
+}
+
+function renderPIDResults(data) {
+  const results = document.getElementById('pid-results');
+  const ext = data.extracted || {};
+  const gs = data.graph_summary || {};
+  const eq = ext.equipment || [];
+  const inst = ext.instruments || [];
+  const conn = ext.connections || [];
+  const zones = ext.hazardous_areas || [];
+  const info = ext.drawing_info || {};
+
+  results.innerHTML = `
+    <div class="pid-section" style="background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3)">
+      <div class="pid-section-title" style="color:var(--green)">✓ Extraction complete</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7">
+        Drawing: <strong style="color:var(--text)">${info.drawing_number||'–'}</strong><br>
+        Equipment: <strong style="color:var(--blue)">${eq.length} items</strong> extracted<br>
+        Instruments: <strong style="color:var(--blue)">${inst.length} items</strong> extracted<br>
+        Connections: <strong style="color:var(--blue)">${conn.length} links</strong> mapped<br>
+        Graph: now <strong style="color:var(--blue)">${gs.total_nodes||'–'} nodes, ${gs.total_edges||'–'} edges</strong>
+      </div>
+    </div>
+
+    ${eq.length ? `<div class="pid-section">
+      <div class="pid-section-title">Equipment (${eq.length})</div>
+      ${eq.map(e => `<span class="pid-tag" title="${e.description||''}">${e.tag} <span style="color:var(--text3);font-size:10px;margin-left:4px">${e.type||''}</span></span>`).join('')}
+    </div>` : ''}
+
+    ${inst.length ? `<div class="pid-section">
+      <div class="pid-section-title">Instruments (${inst.length})</div>
+      ${inst.map(i => `<span class="pid-tag" title="${i.service||''}">${i.tag} <span style="color:var(--text3);font-size:10px;margin-left:4px">${i.type||''}</span></span>`).join('')}
+    </div>` : ''}
+
+    ${conn.length ? `<div class="pid-section">
+      <div class="pid-section-title">Process connections (${conn.length})</div>
+      ${conn.map(c => `<div class="pid-conn">${c.from} <span style="color:var(--blue)">→</span> ${c.to} <span style="color:var(--text3);font-size:11px">[${c.fluid||''}]</span></div>`).join('')}
+    </div>` : ''}
+
+    ${zones.length ? `<div class="pid-section" style="border-color:rgba(245,158,11,0.4)">
+      <div class="pid-section-title" style="color:var(--amber)">⚠ Hazardous areas</div>
+      ${zones.map(z => `<div style="font-size:12px;color:var(--text2);padding:3px 0">${z.zone}: ${z.classification||''} ${z.description||''}</div>`).join('')}
+    </div>` : ''}
+
+    ${gs.equipment_added && gs.equipment_added.length ? `<div class="pid-section" style="border-color:rgba(59,130,246,0.4)">
+      <div class="pid-section-title" style="color:var(--blue)">New nodes added to graph</div>
+      <div style="font-size:12px;color:var(--text2)">${gs.equipment_added.join(', ')}</div>
+    </div>` : ''}
+
+    <button class="pid-upload-btn" onclick="hidePIDPanel();if(graphData){graphData=null;loadGraph();}" style="width:100%">
+      🕸 View updated knowledge graph
+    </button>
+  `;
+}
+
+// ── Knowledge Graph ──────────────────────────────────────────────────────────
+let graphData = null;
+let graphVisible = false;
+let animFrame = null;
+
+// Node physics state
+let nodes = [], links = [];
+let dragging = null;
+let mouseX = 0, mouseY = 0;
+let offsetX = 0, offsetY = 0;
+
+function toggleGraphView() {
+  graphVisible = !graphVisible;
+  document.getElementById('graph-view').classList.toggle('show', graphVisible);
+  document.getElementById('graph-tab-btn').classList.toggle('active', graphVisible);
+  // Hide input bar when graph is shown
+  document.querySelector('.chat-wrap').style.display = graphVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display = graphVisible ? 'none' : '';
+  if (graphVisible && !graphData) loadGraph();
+  else if (graphVisible && graphData) renderGraph();
+  // Close health view if it happens to be open, only one full-screen view at a time
+  if (graphVisible && healthVisible) {
+    healthVisible = false;
+    document.getElementById('health-view').classList.remove('show');
+    document.getElementById('health-tab-btn').classList.remove('active');
+  }
+}
+
+// ── Health Dashboard ─────────────────────────────────────────────────────────
+let healthVisible = false;
+let healthDataLoaded = false;
+
+function toggleHealthView() {
+  healthVisible = !healthVisible;
+  document.getElementById('health-view').classList.toggle('show', healthVisible);
+  document.getElementById('health-tab-btn').classList.toggle('active', healthVisible);
+  document.querySelector('.chat-wrap').style.display = healthVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display = healthVisible ? 'none' : '';
+  // Close graph view if it happens to be open, only one full-screen view at a time
+  if (healthVisible && graphVisible) {
+    graphVisible = false;
+    document.getElementById('graph-view').classList.remove('show');
+    document.getElementById('graph-tab-btn').classList.remove('active');
+  }
+  if (healthVisible) loadHealthScores();
+}
+
+function healthColor(score) {
+  if (score >= 80) return '#10b981';
+  if (score >= 60) return '#84cc16';
+  if (score >= 40) return '#f59e0b';
+  if (score >= 20) return '#f97316';
+  return '#ef4444';
+}
+
+async function loadHealthScores() {
+  const wrap = document.getElementById('health-grid-wrap');
+  try {
+    const r = await fetch('/api/health-scores');
+    const d = await r.json();
+    const equipment = d.equipment || [];
+
+    if (equipment.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;margin-top:40px;grid-column:1/-1">No equipment data available</div>';
+      return;
+    }
+
+    const avg = Math.round(equipment.reduce((s, e) => s + e.health_score, 0) / equipment.length);
+    document.getElementById('hstat-count').textContent = equipment.length;
+    document.getElementById('hstat-avg').textContent = avg + '%';
+
+    wrap.innerHTML = equipment.map(e => {
+      const color = healthColor(e.health_score);
+      const isComputed = e.risk_source === 'computed_from_telemetry';
+      const sourceLabel = isComputed ? '🔬 Computed from live sensor data' : '📌 Static classification';
+      // Show forecast or threshold-already-crossed info
+      let forecastHtml = '';
+      if (e.forecast_text) {
+        forecastHtml = `<div class="health-card-forecast">📈 ${escHtml(e.forecast_text)}</div>`;
+      } else if (e.threshold_crossings && e.threshold_crossings.length > 0) {
+        const lvlColor = e.threshold_crossings[0].threshold_level === 'critical' ? '#ef4444'
+                       : e.threshold_crossings[0].threshold_level === 'alert'    ? '#f97316' : '#f59e0b';
+        const lines = e.threshold_crossings.map(c => {
+          const ago = c.days_ago === 0 ? 'today' : c.days_ago === 1 ? '1 day ago' : `~${c.days_ago} days ago`;
+          return `${c.label}: ${c.current_value} ${c.unit}, crossed ${c.threshold_level} threshold ${ago}`;
+        }).join('<br>');
+        forecastHtml = `<div class="health-card-forecast" style="color:${lvlColor};font-style:normal;font-size:11px;line-height:1.6">📉 ${lines}</div>`;
+      } else if (e.risk_level === 'CRITICAL' && e.risk_source === 'computed_from_telemetry') {
+        forecastHtml = `<div class="health-card-forecast" style="color:#ef4444;font-style:normal">⚠ Parameters already exceed critical threshold. Immediate action required.</div>`;
+      }
+      return `<div class="health-card" onclick="askAboutAlert('${e.tag}')" style="cursor:pointer">
+        <div class="health-card-top">
+          <div>
+            <div class="health-card-tag">${escHtml(e.tag)}</div>
+            <div class="health-card-name">${escHtml(e.name)}</div>
+          </div>
+          <div class="health-score-ring" style="background:${color}22;color:${color};border:2px solid ${color}">${e.health_score}</div>
+        </div>
+        <div class="health-bar-track"><div class="health-bar-fill" style="width:${e.health_score}%;background:${color}"></div></div>
+        <span class="health-card-risk" style="background:${color}22;color:${color}">${escHtml(e.risk_level)} risk</span>
+        <div class="health-card-source">${sourceLabel}</div>
+        ${forecastHtml}
+      </div>`;
+    }).join('');
+    healthDataLoaded = true;
+  } catch (e) {
+    wrap.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;margin-top:40px;grid-column:1/-1">Could not load health data</div>';
+  }
+}
+
+// ── Shift Handover Report ────────────────────────────────────────────────────
+async function downloadShiftReport() {
+  const btn = document.getElementById('shift-report-btn');
+  const originalText = btn.textContent;
+  btn.textContent = '⏳ Generating...';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/shift-report');
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      showToast(err.error || 'Could not generate shift report.');
+      return;
+    }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const disposition = r.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    a.download = match ? match[1] : 'PlantIQ_Shift_Report.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Shift report downloaded.');
+  } catch (e) {
+    showToast('Could not reach the server to generate the report.');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}
+
+async function loadGraph() {
+  try {
+    const r = await fetch('/api/graph');
+    graphData = await r.json();
+    document.getElementById('gstat-nodes').textContent = graphData.stats.nodes;
+    document.getElementById('gstat-edges').textContent = graphData.stats.edges;
+    loadCriticalEquipment();
+    renderGraph();
+  } catch(e) { console.error('Graph load error:', e); }
+}
+
+async function loadCriticalEquipment() {
+  try {
+    const r = await fetch('/api/graph/critical');
+    const data = await r.json();
+    const high = data.filter(e => ['CRITICAL','MEDIUM-HIGH'].includes(e.risk_level)).slice(0,4);
+    const listEl = document.getElementById('critical-list');
+    if (high.length === 0) { listEl.innerHTML = '<div style="color:var(--text3);font-size:11px">All equipment normal</div>'; return; }
+    listEl.innerHTML = high.map(e => {
+      const riskCls = e.risk_level === 'CRITICAL' ? 'risk-critical' : 'risk-high';
+      const detail = (e.alert || e.note || '').substring(0, 60);
+      return `<div class="critical-eq">
+        <div class="critical-eq-tag">${e.tag}</div>
+        <div>
+          <div><span class="critical-eq-risk ${riskCls}">${e.risk_level}</span></div>
+          <div class="critical-eq-detail">${detail}${detail.length>=60?'…':''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
+function renderGraph() {
+  const canvas = document.getElementById('graph-canvas');
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  if (!graphData || !graphData.nodes) return;
+
+  // Init node positions with force-directed layout seed
+  const nodeMap = {};
+  nodes = graphData.nodes.map((n, i) => {
+    const angle = (i / graphData.nodes.length) * Math.PI * 2;
+    const r = Math.min(W, H) * 0.32;
+    // Group by type
+    const typeOffset = {EQUIPMENT:0, INCIDENT:Math.PI*0.5, DOCUMENT:Math.PI, REGULATION:Math.PI*1.5, SPARE_PART:Math.PI*0.25, CAPA:Math.PI*0.75, FINDING:Math.PI*1.25, LOCATION:Math.PI*1.75}[n.type] || 0;
+    const adjustedAngle = angle + typeOffset * 0.3;
+    const obj = {
+      ...n, x: W/2 + Math.cos(adjustedAngle)*r + (Math.random()-0.5)*60,
+      y: H/2 + Math.sin(adjustedAngle)*r + (Math.random()-0.5)*60,
+      vx: 0, vy: 0
+    };
+    nodeMap[n.id] = obj;
+    return obj;
+  });
+
+  links = graphData.links.map(l => ({
+    ...l,
+    source: nodeMap[l.source],
+    target: nodeMap[l.target]
+  })).filter(l => l.source && l.target);
+
+  // Force simulation (simple)
+  let tick = 0;
+  function simulate() {
+    if (tick < 120) {
+      nodes.forEach(n => { n.vx *= 0.85; n.vy *= 0.85; });
+      // Repulsion
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i+1; j < nodes.length; j++) {
+          const dx = nodes[j].x - nodes[i].x;
+          const dy = nodes[j].y - nodes[i].y;
+          const d = Math.sqrt(dx*dx+dy*dy) || 1;
+          const f = Math.min(800, 2400/(d*d));
+          nodes[i].vx -= dx/d*f; nodes[i].vy -= dy/d*f;
+          nodes[j].vx += dx/d*f; nodes[j].vy += dy/d*f;
+        }
+      }
+      // Attraction along edges
+      links.forEach(l => {
+        const dx = l.target.x - l.source.x;
+        const dy = l.target.y - l.source.y;
+        const d = Math.sqrt(dx*dx+dy*dy) || 1;
+        const idealDist = 120;
+        const f = (d - idealDist) * 0.05;
+        l.source.vx += dx/d*f; l.source.vy += dy/d*f;
+        l.target.vx -= dx/d*f; l.target.vy -= dy/d*f;
+      });
+      // Centre gravity
+      nodes.forEach(n => {
+        n.vx += (W/2 - n.x) * 0.003;
+        n.vy += (H/2 - n.y) * 0.003;
+        n.x += n.vx; n.y += n.vy;
+        n.x = Math.max(30, Math.min(W-30, n.x));
+        n.y = Math.max(30, Math.min(H-30, n.y));
+      });
+      tick++;
+    }
+    draw();
+    if (graphVisible) animFrame = requestAnimationFrame(simulate);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw edges
+    links.forEach(l => {
+      ctx.beginPath();
+      ctx.moveTo(l.source.x, l.source.y);
+      ctx.lineTo(l.target.x, l.target.y);
+      ctx.strokeStyle = l.color || '#1e2d45';
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Arrow
+      const angle = Math.atan2(l.target.y - l.source.y, l.target.x - l.source.x);
+      const mx = (l.source.x + l.target.x)/2;
+      const my = (l.source.y + l.target.y)/2;
+      ctx.save();
+      ctx.translate(mx, my);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.moveTo(0,0); ctx.lineTo(-8,-4); ctx.lineTo(-8,4); ctx.closePath();
+      ctx.fillStyle = l.color || '#1e2d45';
+      ctx.globalAlpha = 0.6;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    });
+
+    // Draw nodes
+    nodes.forEach(n => {
+      const r = n.size || 10;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI*2);
+      ctx.fillStyle = n.color || '#3b82f6';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Label
+      ctx.fillStyle = '#c9d6e8';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(n.label, n.x, n.y + r + 3);
+    });
+  }
+
+  // Mouse hover tooltip
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const tooltip = document.getElementById('node-tooltip');
+    let found = null;
+    nodes.forEach(n => {
+      const d = Math.sqrt((n.x-mx)**2 + (n.y-my)**2);
+      if (d < (n.size||10) + 4) found = n;
+    });
+    if (found) {
+      const d = found.data || {};
+      let html = `<strong style="color:#fff">${d.tag||d.code||d.name||found.label}</strong><br>
+        <span style="color:var(--text3)">${found.type}</span>`;
+      if (d.status) html += `<br>Status: ${d.status}`;
+      if (d.risk_level) html += `<br>Risk: <span style="color:${found.color}">${d.risk_level}</span>`;
+      if (d.alert) html += `<br><span style="color:#ef4444">⚠️ ${d.alert.substring(0,80)}…</span>`;
+      if (d.description) html += `<br>${d.description.substring(0,80)}`;
+      tooltip.innerHTML = html;
+      tooltip.style.display = 'block';
+      tooltip.style.left = (mx+16)+'px';
+      tooltip.style.top = (my-10)+'px';
+    } else {
+      tooltip.style.display = 'none';
+    }
+  };
+
+  canvas.onmouseleave = () => { document.getElementById('node-tooltip').style.display = 'none'; };
+
+  // Drag
+  canvas.onmousedown = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    nodes.forEach(n => {
+      if (Math.sqrt((n.x-mx)**2+(n.y-my)**2) < (n.size||10)+4) {
+        dragging = n; offsetX = mx-n.x; offsetY = my-n.y;
+      }
+    });
+  };
+  canvas.onmouseup = () => { dragging = null; };
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    if (dragging) { dragging.x = mx-offsetX; dragging.y = my-offsetY; dragging.vx=0; dragging.vy=0; }
+    // Tooltip
+    const tooltip = document.getElementById('node-tooltip');
+    let found = null;
+    nodes.forEach(n => { if (Math.sqrt((n.x-mx)**2+(n.y-my)**2)<(n.size||10)+4) found=n; });
+    if (found && !dragging) {
+      const d = found.data||{};
+      let html = `<strong style="color:#fff">${d.tag||d.code||d.name||found.label}</strong> <span style="color:var(--text3);font-size:10px">${found.type}</span>`;
+      if (d.status) html += `<br>📌 ${d.status}`;
+      if (d.risk_level) html += `<br>Risk: <span style="color:${found.color};font-weight:600">${d.risk_level}</span>`;
+      if (d.alert) html += `<br><span style="color:#ef4444">⚠️ ${d.alert.substring(0,90)}${d.alert.length>90?'…':''}</span>`;
+      if (d.description) html += `<br>${d.description.substring(0,80)}`;
+      if (d.root_cause) html += `<br>Root cause: ${d.root_cause.substring(0,80)}…`;
+      tooltip.innerHTML = html;
+      tooltip.style.display='block';
+      tooltip.style.left=(mx+16)+'px';
+      tooltip.style.top=Math.min(my-10, H-120)+'px';
+    } else if (!dragging) { tooltip.style.display='none'; }
+  };
+
+  if (animFrame) cancelAnimationFrame(animFrame);
+  simulate();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' toast-' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Work Order Priority Panel ──────────────────────────────────────────────
+let woVisible = false;
+
+function toggleWOView() {
+  woVisible = !woVisible;
+  document.getElementById('wo-view').classList.toggle('show', woVisible);
+  document.getElementById('wo-tab-btn').classList.toggle('active', woVisible);
+  document.querySelector('.chat-wrap').style.display   = woVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display   = woVisible ? 'none' : '';
+  // Close other full-screen views
+  if (woVisible && graphVisible) {
+    graphVisible = false;
+    document.getElementById('graph-view').classList.remove('show');
+    document.getElementById('graph-tab-btn').classList.remove('active');
+  }
+  if (woVisible && healthVisible) {
+    healthVisible = false;
+    document.getElementById('health-view').classList.remove('show');
+    document.getElementById('health-tab-btn').classList.remove('active');
+  }
+  if (woVisible) loadWOPriorities();
+}
+
+async function loadWOPriorities() {
+  const list = document.getElementById('wo-list');
+  list.innerHTML = '<div class="wo-empty">Computing priorities...</div>';
+  try {
+    const r = await fetch('/api/work-order-priorities');
+    const d = await r.json();
+    const priorities = d.priorities || [];
+
+    document.getElementById('wostat-count').textContent = priorities.length;
+    document.getElementById('wostat-immediate').textContent =
+      priorities.filter(p => p.urgency === 'IMMEDIATE').length;
+    document.getElementById('wostat-shift').textContent =
+      priorities.filter(p => p.urgency === 'THIS SHIFT').length;
+
+    if (priorities.length === 0) {
+      list.innerHTML = '<div class="wo-empty">No maintenance actions flagged at this time.</div>';
+      return;
+    }
+
+    const URGENCY_CLS = {
+      'IMMEDIATE':  'immediate',
+      'THIS SHIFT': 'this-shift',
+      'THIS WEEK':  'this-week',
+      'MONITOR':    'monitor',
+    };
+
+    list.innerHTML = priorities.map(p => {
+      const ucls   = URGENCY_CLS[p.urgency] || 'monitor';
+      const barPct = Math.round(p.score);
+      const barClr = p.score >= 75 ? '#ef4444' : p.score >= 50 ? '#f59e0b' : p.score >= 30 ? '#3b82f6' : '#4a5568';
+      const reasonTags = (p.reasons || []).map(r => `<span>${escHtml(r)}</span>`).join('');
+      const forecastPill = p.forecast_text
+        ? `<div class="wo-forecast-pill">📈 ${escHtml(p.forecast_text)}</div>`
+        : '';
+      const daysHint = p.days_to_threshold
+        ? `<span style="color:#818cf8;font-size:11px;font-weight:600">${p.days_to_threshold}d to threshold</span>`
+        : '';
+
+      return `<div class="wo-card urgency-${ucls}" onclick="askAboutWO('${escHtml(p.tag)}', '${ucls}')">
+        <div class="wo-rank">#${p.rank}</div>
+        <div class="wo-body">
+          <div class="wo-top">
+            <span class="wo-tag">${escHtml(p.tag)}</span>
+            <span class="wo-name">${escHtml(p.name)}</span>
+            <span class="wo-urgency-badge ${ucls}">${escHtml(p.urgency)}</span>
+            ${daysHint}
+          </div>
+          <div class="wo-action">→ ${escHtml(p.recommended_action)}</div>
+          <div class="wo-reasons">${reasonTags}</div>
+          ${forecastPill}
+        </div>
+        <div class="wo-score-bar-wrap">
+          <div class="wo-score-num" style="color:${barClr}">${p.score}</div>
+          <div class="wo-score-label">Score</div>
+          <div class="wo-score-bar"><div class="wo-score-bar-fill" style="width:${barPct}%;background:${barClr}"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="wo-empty">Could not load priorities. Is the server running?</div>';
+  }
+}
+
+function askAboutWO(tag, urgency) {
+  // Close the panel and ask a focused question about this equipment
+  woVisible = false;
+  document.getElementById('wo-view').classList.remove('show');
+  document.getElementById('wo-tab-btn').classList.remove('active');
+  document.querySelector('.chat-wrap').style.display = '';
+  document.querySelector('.input-bar').style.display = '';
+  const q = urgency === 'immediate'
+    ? `What immediate actions are required for ${tag} and what are the safety risks if we delay?`
+    : `What is the maintenance priority and recommended action plan for ${tag}?`;
+  document.getElementById('input-box').value = q;
+  sendMessage();
+}
+
+
+// ── What-If Simulator ─────────────────────────────────────────────────────────
+let whatifVisible = false;
+let wiEquipmentData = {};   // tag -> full equipment object
+let wiCurrentTag = '';
+let wiCurrentReadings = {}; // param -> current value (for slider reset)
+
+const WI_PARAM_META = {
+  vibration_mm_s:        { label: 'Vibration',          unit: 'mm/s', min: 0.5,  max: 8.0,  step: 0.1 },
+  bearing_temp_c:        { label: 'Bearing Temperature', unit: 'C',    min: 40,   max: 120,  step: 1   },
+  oil_iron_ppm:          { label: 'Oil Iron Content',    unit: 'ppm',  min: 0,    max: 80,   step: 1   },
+  bearing_overdue_hours: { label: 'Bearing Overdue',     unit: 'hrs',  min: 0,    max: 50000,step: 500 },
+};
+
+const RISK_COLORS_WI = {
+  CRITICAL:'#ef4444', HIGH:'#f97316', 'MEDIUM-HIGH':'#f59e0b',
+  MEDIUM:'#3b82f6', 'LOW-MEDIUM':'#10b981', LOW:'#10b981', UNKNOWN:'#64748b'
+};
+
+function toggleWhatIfView() {
+  whatifVisible = !whatifVisible;
+  document.getElementById('whatif-view').classList.toggle('show', whatifVisible);
+  document.getElementById('whatif-tab-btn').classList.toggle('active', whatifVisible);
+  document.querySelector('.chat-wrap').style.display  = whatifVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display  = whatifVisible ? 'none' : '';
+  if (whatifVisible && graphVisible)  { graphVisible=false;  document.getElementById('graph-view').classList.remove('show');  document.getElementById('graph-tab-btn').classList.remove('active'); }
+  if (whatifVisible && healthVisible) { healthVisible=false; document.getElementById('health-view').classList.remove('show'); document.getElementById('health-tab-btn').classList.remove('active'); }
+  if (whatifVisible && woVisible)     { woVisible=false;     document.getElementById('wo-view').classList.remove('show');     document.getElementById('wo-tab-btn').classList.remove('active'); }
+  if (whatifVisible) loadWIEquipmentList();
+}
+
+async function loadWIEquipmentList() {
+  try {
+    const r = await fetch('/api/whatif/equipment');
+    const d = await r.json();
+    const sel = document.getElementById('wi-eq-select');
+    wiEquipmentData = {};
+    sel.innerHTML = '<option value="">Choose equipment...</option>';
+    (d.equipment || []).forEach(e => {
+      wiEquipmentData[e.tag] = e;
+      if (e.has_telemetry) {
+        const opt = document.createElement('option');
+        opt.value = e.tag;
+        opt.textContent = `${e.tag}: ${e.name} (${e.risk_level})`;
+        sel.appendChild(opt);
+      }
+    });
+  } catch(e) { console.error('WI equipment load error:', e); }
+}
+
+function loadWIEquipment(tag) {
+  wiCurrentTag = tag;
+  const area = document.getElementById('wi-params-area');
+  if (!tag || !wiEquipmentData[tag]) {
+    area.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;margin-top:8px">Select equipment to see parameters</div>';
+    return;
+  }
+  const eq = wiEquipmentData[tag];
+  wiCurrentReadings = { ...eq.readings };
+
+  let html = '';
+
+  // Sensor parameter sliders
+  Object.entries(WI_PARAM_META).forEach(([param, meta]) => {
+    const current = eq.readings[param];
+    if (current === undefined) return;
+    const thr = eq.thresholds[param] || {};
+    const pct = Math.min(100, ((current - meta.min) / (meta.max - meta.min)) * 100);
+    const thrPills = [
+      thr.watch    ? `<span class="wi-thr-pill wi-thr-watch">Watch: ${thr.watch}</span>` : '',
+      thr.alert    ? `<span class="wi-thr-pill wi-thr-alert">Alert: ${thr.alert}</span>` : '',
+      thr.critical ? `<span class="wi-thr-pill wi-thr-critical">Critical: ${thr.critical}</span>` : '',
+    ].join('');
+
+    html += `<div class="wi-param-block">
+      <div class="wi-param-name">${meta.label}</div>
+      <div class="wi-param-meta">Current: <strong style="color:var(--text)">${current} ${meta.unit}</strong></div>
+      <div class="wi-param-row">
+        <input type="range" class="wi-slider" id="wi-slider-${param}"
+          min="${meta.min}" max="${meta.max}" step="${meta.step}" value="${current}"
+          oninput="updateWIVal('${param}', this.value, '${meta.unit}')">
+        <span class="wi-val-display" id="wi-val-${param}">${current} ${meta.unit}</span>
+      </div>
+      <div class="wi-threshold-pills">${thrPills}</div>
+    </div>`;
+  });
+
+  // Defer days
+  html += `<div class="wi-defer-block">
+    <div class="wi-section-label">Maintenance Deferral</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.5">Project all sensor readings forward along current trend lines by N days (simulates postponing maintenance)</div>
+    <div class="wi-defer-row">
+      <input type="number" class="wi-defer-num" id="wi-defer-days" min="0" max="365" value="0" placeholder="0">
+      <span style="font-size:12px;color:var(--text2)">days deferred</span>
+    </div>
+  </div>`;
+
+  html += `<button class="wi-run-btn" id="wi-run-btn" onclick="runWISimulation()">🔮 Run Simulation</button>`;
+  html += `<button class="wi-reset-btn" onclick="resetWISliders()">↺ Reset to current values</button>`;
+
+  area.innerHTML = html;
+
+  // Colour sliders based on threshold
+  Object.keys(WI_PARAM_META).forEach(param => {
+    if (eq.readings[param] !== undefined) updateWISliderColor(param, eq.readings[param]);
+  });
+}
+
+function updateWIVal(param, val, unit) {
+  document.getElementById(`wi-val-${param}`).textContent = `${parseFloat(val).toFixed(param === 'bearing_overdue_hours' ? 0 : 1)} ${unit}`;
+  updateWISliderColor(param, parseFloat(val));
+}
+
+function updateWISliderColor(param, val) {
+  const slider = document.getElementById(`wi-slider-${param}`);
+  if (!slider || !wiCurrentTag) return;
+  const eq = wiEquipmentData[wiCurrentTag];
+  const thr = (eq && eq.thresholds && eq.thresholds[param]) || {};
+  let color = '#10b981';
+  if (thr.critical && val >= thr.critical) color = '#ef4444';
+  else if (thr.alert && val >= thr.alert)  color = '#f97316';
+  else if (thr.watch && val >= thr.watch)  color = '#f59e0b';
+  const meta = WI_PARAM_META[param];
+  const pct = Math.min(100, ((val - meta.min) / (meta.max - meta.min)) * 100);
+  slider.style.background = `linear-gradient(to right, ${color} ${pct}%, var(--bg3) ${pct}%)`;
+}
+
+function resetWISliders() {
+  if (!wiCurrentTag) return;
+  loadWIEquipment(wiCurrentTag);
+  document.getElementById('wi-results').innerHTML = `<div class="wi-placeholder">
+    <div class="wi-placeholder-icon">🔮</div>
+    <div class="wi-placeholder-text">Parameters reset. Adjust values and run simulation.</div>
+  </div>`;
+}
+
+async function runWISimulation() {
+  if (!wiCurrentTag) return;
+  const btn = document.getElementById('wi-run-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Simulating...';
+
+  const overrides = {};
+  const eq = wiEquipmentData[wiCurrentTag];
+
+  Object.keys(WI_PARAM_META).forEach(param => {
+    const slider = document.getElementById(`wi-slider-${param}`);
+    if (!slider) return;
+    const original = wiCurrentReadings[param];
+    const newVal = parseFloat(slider.value);
+    if (original !== undefined && Math.abs(newVal - original) > 0.001) {
+      overrides[param] = newVal;
+    }
+  });
+
+  const deferEl = document.getElementById('wi-defer-days');
+  const deferDays = deferEl ? parseInt(deferEl.value) || 0 : 0;
+  if (deferDays > 0) overrides.defer_days = deferDays;
+
+  try {
+    const r = await fetch('/api/whatif/simulate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ tag: wiCurrentTag, overrides }),
+    });
+    const data = await r.json();
+    if (data.error) {
+      showToast('Simulation error: ' + data.error, 'error');
+      return;
+    }
+    renderWIResults(data);
+  } catch(e) {
+    showToast('Could not reach server for simulation.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔮 Run Simulation';
+  }
+}
+
+function renderWIResults(d) {
+  const results = document.getElementById('wi-results');
+  const b = d.baseline, s = d.simulated, delta = d.delta;
+
+  const riskCol = c => RISK_COLORS_WI[c] || '#64748b';
+  const simCardCls = delta.risk_escalated ? 'escalated' : delta.risk_improved ? 'improved' : '';
+  const deltaIcon = delta.risk_escalated ? '⬆' : delta.risk_improved ? '⬇' : '→';
+  const deltaColor = delta.risk_escalated ? '#ef4444' : delta.risk_improved ? '#10b981' : '#64748b';
+
+  const scoreBar = (score, color) =>
+    `<div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:4px">
+       <div style="height:4px;width:${score}%;background:${color};border-radius:2px"></div>
+     </div>`;
+
+  // Baseline card
+  const baseCard = `<div class="wi-state-card baseline-card">
+    <div class="wi-state-label">📍 Current (Baseline)</div>
+    <div class="wi-state-risk" style="color:${riskCol(b.risk_level)}">${b.risk_level}</div>
+    <div class="wi-state-score">Health Score: <strong>${b.health_score}</strong>/100</div>
+    ${scoreBar(b.health_score, riskCol(b.risk_level))}
+    ${b.forecast_text ? `<div class="wi-forecast-line">📈 ${escHtml(b.forecast_text)}</div>` : ''}
+  </div>`;
+
+  // Simulated card
+  const simCard = `<div class="wi-state-card sim-card ${simCardCls}">
+    <div class="wi-state-label">🔮 Simulated</div>
+    <div class="wi-state-risk" style="color:${riskCol(s.risk_level)}">${s.risk_level}</div>
+    <div class="wi-state-score">Health Score: <strong>${s.health_score}</strong>/100
+      <span style="color:${deltaColor};font-weight:700;margin-left:6px">${deltaIcon} ${delta.score_delta > 0 ? '+' : ''}${delta.score_delta}</span>
+    </div>
+    ${scoreBar(s.health_score, riskCol(s.risk_level))}
+    ${s.forecast_text ? `<div class="wi-forecast-line">📈 ${escHtml(s.forecast_text)}</div>` : ''}
+  </div>`;
+
+  // Insights
+  const insightsHtml = d.insights.map(ins => {
+    const icon = ins.includes('escalate') || ins.includes('CRITICAL') ? '🔴'
+               : ins.includes('improve') || ins.includes('LOW') ? '🟢'
+               : ins.includes('H2S') ? '☣'
+               : ins.includes('cascade') || ins.includes('Connected') ? '🔗'
+               : ins.includes('Defer') || ins.includes('defer') ? '📅'
+               : '💡';
+    return `<div class="wi-insight"><span class="wi-insight-icon">${icon}</span><span>${escHtml(ins)}</span></div>`;
+  }).join('');
+
+  // Cascade
+  const cascadeHtml = d.cascade && d.cascade.length > 0
+    ? `<div class="wi-cascade-card">
+        <div class="wi-delta-title">🔗 Connected Equipment at Risk</div>
+        ${d.cascade.map(c => `<div class="wi-cascade-item">
+          <span class="wi-cascade-tag">${escHtml(c.tag)}</span>
+          <span>${escHtml(c.name)}: ${escHtml(c.impact)}</span>
+        </div>`).join('')}
+      </div>`
+    : '';
+
+  // Ask PlantIQ button
+  const scenarioDesc = Object.entries(d.overrides_applied)
+    .map(([k,v]) => `${k.replace(/_/g,' ')} = ${v}`)
+    .join(', ');
+  const askQ = `Given a what-if scenario where ${d.tag} has ${scenarioDesc}: what are the safety implications and recommended actions?`;
+
+  results.innerHTML = `
+    <div class="wi-compare-row">${baseCard}${simCard}</div>
+    <div class="wi-delta-card">
+      <div class="wi-delta-title">💡 Simulation Insights</div>
+      ${insightsHtml || '<div style="color:var(--text3);font-size:12px">No significant changes detected.</div>'}
+    </div>
+    ${cascadeHtml}
+    <button class="wi-ask-btn" id="wi-ask-scenario-btn">
+      💬 Ask PlantIQ about this scenario
+    </button>
+  `;
+  // Assign click handler via JS to avoid quote-escaping issues in onclick HTML attribute
+  const askBtn = document.getElementById('wi-ask-scenario-btn');
+  if (askBtn) askBtn.onclick = () => askAboutWhatIf(askQ);
+}
+
+function askAboutWhatIf(question) {
+  whatifVisible = false;
+  document.getElementById('whatif-view').classList.remove('show');
+  document.getElementById('whatif-tab-btn').classList.remove('active');
+  document.querySelector('.chat-wrap').style.display = '';
+  document.querySelector('.input-bar').style.display = '';
+  document.getElementById('input-box').value = question;
+  setTimeout(() => sendMessage(), 80);
+}
+
+
+// ── Incident Pattern Matcher ──────────────────────────────────────────────────
+let ipmVisible = false;
+let ipmSelectedSignals = new Set();
+
+function toggleIPMView() {
+  ipmVisible = !ipmVisible;
+  document.getElementById('ipm-view').classList.toggle('show', ipmVisible);
+  document.getElementById('ipm-tab-btn').classList.toggle('active', ipmVisible);
+  document.querySelector('.chat-wrap').style.display  = ipmVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display  = ipmVisible ? 'none' : '';
+  if (ipmVisible && graphVisible)   { graphVisible=false;   document.getElementById('graph-view').classList.remove('show');   document.getElementById('graph-tab-btn').classList.remove('active'); }
+  if (ipmVisible && healthVisible)  { healthVisible=false;  document.getElementById('health-view').classList.remove('show');  document.getElementById('health-tab-btn').classList.remove('active'); }
+  if (ipmVisible && woVisible)      { woVisible=false;      document.getElementById('wo-view').classList.remove('show');      document.getElementById('wo-tab-btn').classList.remove('active'); }
+  if (ipmVisible && whatifVisible)  { whatifVisible=false;  document.getElementById('whatif-view').classList.remove('show'); document.getElementById('whatif-tab-btn').classList.remove('active'); }
+  if (ipmVisible) loadIPMSignals();
+}
+
+async function loadIPMSignals() {
+  try {
+    const r = await fetch('/api/incidents/signals');
+    const d = await r.json();
+    const chips = document.getElementById('ipm-chips');
+    chips.innerHTML = (d.signals || []).map(s =>
+      `<span class="ipm-chip" data-signal="${s.signal}" onclick="toggleIPMChip(this, '${escHtml(s.label)}')">${escHtml(s.label)}</span>`
+    ).join('');
+  } catch(e) {
+    document.getElementById('ipm-chips').innerHTML = '<div style="color:var(--text3);font-size:11px">Could not load signals</div>';
+  }
+}
+
+function toggleIPMChip(chip, label) {
+  const signal = chip.dataset.signal;
+  if (ipmSelectedSignals.has(signal)) {
+    ipmSelectedSignals.delete(signal);
+    chip.classList.remove('selected');
+  } else {
+    ipmSelectedSignals.add(signal);
+    chip.classList.add('selected');
+  }
+  // Append label to textarea
+  const ta = document.getElementById('ipm-query');
+  const current = ta.value.trim();
+  if (!chip.classList.contains('selected')) {
+    // Remove it from textarea if deselected
+    ta.value = current.replace(new RegExp(label.toLowerCase() + ',?\s*', 'i'), '').trim().replace(/,$/, '');
+  } else {
+    ta.value = current ? current + ', ' + label.toLowerCase() : label.toLowerCase();
+  }
+}
+
+function clearIPM() {
+  document.getElementById('ipm-query').value = '';
+  ipmSelectedSignals.clear();
+  document.querySelectorAll('.ipm-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('ipm-results').innerHTML = `<div class="ipm-placeholder">
+    <div class="ipm-placeholder-icon">🔍</div>
+    <div class="ipm-placeholder-text">Describe the symptoms you are seeing,<br>then click <strong>Find Similar Incidents</strong><br>to see matching historical cases.</div>
+  </div>`;
+}
+
+async function runIPMSearch() {
+  const query = document.getElementById('ipm-query').value.trim();
+  if (!query) { showToast('Enter some symptoms first.'); return; }
+  const btn = document.getElementById('ipm-search-btn');
+  btn.disabled = true; btn.textContent = '⏳ Searching...';
+  try {
+    const r = await fetch('/api/incidents/match', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ query }),
+    });
+    const d = await r.json();
+    renderIPMResults(d);
+  } catch(e) {
+    showToast('Could not reach server.', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '🔍 Find Similar Incidents';
+  }
+}
+
+function renderIPMResults(d) {
+  const results = document.getElementById('ipm-results');
+  const matches = d.matches || [];
+
+  if (matches.length === 0) {
+    results.innerHTML = `<div class="ipm-no-match">
+      No historical incidents match these symptoms.<br>
+      <span style="font-size:12px">Try different keywords or select more symptom chips.</span>
+    </div>`;
+    return;
+  }
+
+  const SEV_CLS = { HIGH:'ipm-badge-sev-high', MEDIUM:'ipm-badge-sev-med', LOW:'ipm-badge-sev-low' };
+  const scoreColor = s => s >= 80 ? '#10b981' : s >= 50 ? '#f59e0b' : '#64748b';
+
+  results.innerHTML = matches.map((m, idx) => {
+    const sc = m.score;
+    const scCol = scoreColor(sc);
+    const sevCls = SEV_CLS[m.severity] || 'ipm-badge-sev-low';
+
+    const badges = [
+      `<span class="ipm-badge ${sevCls}">${escHtml(m.severity)} severity</span>`,
+      m.h2s_ppm > 0 ? `<span class="ipm-badge ipm-badge-h2s">☣ H2S ${m.h2s_ppm}ppm</span>` : '',
+      m.injury ? `<span class="ipm-badge ipm-badge-injury">⚠ Injury</span>` : '',
+      ...(m.matched_signals||[]).map(s => `<span class="ipm-badge ipm-badge-signal">${escHtml(s.replace(/_/g,' '))}</span>`),
+    ].filter(Boolean).join('');
+
+    const capaHtml = m.capas && m.capas.length > 0
+      ? `<div>
+          <div class="ipm-section-title">Corrective Actions (CAPAs)</div>
+          ${m.capas.map(c => `<div class="ipm-capa">
+            <span class="ipm-capa-status ${c.status==='COMPLETED'?'capa-done':'capa-inprog'}">${c.status==='COMPLETED'?'Done':'In Progress'}</span>
+            <span>${escHtml(c.action)}</span>
+          </div>`).join('')}
+        </div>`
+      : '';
+
+    const precursorHtml = m.precursors
+      ? `<div>
+          <div class="ipm-section-title">Warning Signs Before Incident</div>
+          <div class="ipm-precursor">${escHtml(m.precursors)}</div>
+        </div>`
+      : '';
+
+    const eqNow = m.equipment_now && m.equipment_now.tag
+      ? `<div class="ipm-eq-now">
+          Equipment today:
+          <span class="ipm-eq-tag">${escHtml(m.equipment_now.tag)}</span>
+          ${escHtml(m.equipment_now.name)},
+          <span style="color:${m.equipment_now.current_risk==='CRITICAL'?'#ef4444':m.equipment_now.current_risk==='MEDIUM-HIGH'?'#f59e0b':'#10b981'};font-weight:600">${escHtml(m.equipment_now.current_risk)}</span>
+        </div>`
+      : '';
+
+    const askQ = `This symptom pattern matches historical incident ${m.id} (${m.type_detail}). What lessons should we apply and what immediate actions should we take?`;
+
+    return `<div class="ipm-match-card">
+      <div class="ipm-match-header">
+        <div class="ipm-match-score">
+          <div class="ipm-score-num" style="color:${scCol}">${sc}%</div>
+          <div class="ipm-score-label">Match</div>
+        </div>
+        <div class="ipm-match-meta">
+          <div class="ipm-match-id">${escHtml(m.id)} &nbsp;·&nbsp; ${escHtml(m.date)} &nbsp;·&nbsp; ${escHtml(m.equipment)}</div>
+          <div class="ipm-match-type">${escHtml(m.type_detail)}</div>
+          <div class="ipm-match-badges">${badges}</div>
+        </div>
+      </div>
+      <div class="ipm-match-body">
+        <div>
+          <div class="ipm-section-title">Root Cause</div>
+          <div class="ipm-root-cause">${escHtml(m.root_cause)}</div>
+        </div>
+        ${precursorHtml}
+        ${capaHtml}
+        ${eqNow}
+        <button class="ipm-ask-btn" data-ask-idx="${idx}">
+          💬 Ask PlantIQ about this incident
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Assign ask button handlers safely (no inline onclick with strings)
+  matches.forEach((m, idx) => {
+    const btn = results.querySelector(`[data-ask-idx="${idx}"]`);
+    if (btn) {
+      const q = `This symptom pattern matches historical incident ${m.id} (${m.type_detail}). What lessons should we apply and what immediate actions should we take?`;
+      btn.onclick = () => askFromIPM(q);
+    }
+  });
+}
+
+function askFromIPM(question) {
+  ipmVisible = false;
+  document.getElementById('ipm-view').classList.remove('show');
+  document.getElementById('ipm-tab-btn').classList.remove('active');
+  document.querySelector('.chat-wrap').style.display = '';
+  document.querySelector('.input-bar').style.display = '';
+  document.getElementById('input-box').value = question;
+  setTimeout(() => sendMessage(), 80);
+}
+
+
+// ── Spare Parts Gap Analyzer ──────────────────────────────────────────────────
+let spVisible = false;
+let spDataLoaded = false;
+
+function toggleSPView() {
+  spVisible = !spVisible;
+  document.getElementById('sp-view').classList.toggle('show', spVisible);
+  document.getElementById('sp-tab-btn').classList.toggle('active', spVisible);
+  document.querySelector('.chat-wrap').style.display  = spVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display  = spVisible ? 'none' : '';
+  if (spVisible && graphVisible)   { graphVisible=false;   document.getElementById('graph-view').classList.remove('show');   document.getElementById('graph-tab-btn').classList.remove('active'); }
+  if (spVisible && healthVisible)  { healthVisible=false;  document.getElementById('health-view').classList.remove('show');  document.getElementById('health-tab-btn').classList.remove('active'); }
+  if (spVisible && woVisible)      { woVisible=false;      document.getElementById('wo-view').classList.remove('show');      document.getElementById('wo-tab-btn').classList.remove('active'); }
+  if (spVisible && whatifVisible)  { whatifVisible=false;  document.getElementById('whatif-view').classList.remove('show');  document.getElementById('whatif-tab-btn').classList.remove('active'); }
+  if (spVisible && ipmVisible)     { ipmVisible=false;     document.getElementById('ipm-view').classList.remove('show');     document.getElementById('ipm-tab-btn').classList.remove('active'); }
+  if (spVisible && !spDataLoaded) loadSPData();
+}
+
+function fmtInr(val) {
+  if (!val) return '0';
+  const L = val / 100000;
+  return L >= 100 ? `₹${(L/100).toFixed(1)} Cr` : `₹${L.toFixed(1)}L`;
+}
+
+const SP_STOCK_CLS = {
+  OUT_OF_STOCK:   'sp-stock-out',
+  BELOW_REORDER:  'sp-stock-low',
+  BELOW_MINIMUM:  'sp-stock-low',
+  ADEQUATE:       'sp-stock-ok',
+};
+const SP_STOCK_LBL = {
+  OUT_OF_STOCK:   'Out of Stock',
+  BELOW_REORDER:  'Below Reorder Point',
+  BELOW_MINIMUM:  'Below Minimum',
+  ADEQUATE:       'Adequate',
+};
+
+async function loadSPData() {
+  const body = document.getElementById('sp-body');
+  try {
+    const r = await fetch('/api/spare-parts');
+    const d = await r.json();
+    if (d.error) { body.innerHTML = `<div class="sp-placeholder">Error: ${escHtml(d.error)}</div>`; return; }
+
+    const s = d.summary;
+    document.getElementById('spstat-parts').textContent    = s.total_parts;
+    document.getElementById('spstat-gaps').textContent     = s.gaps_count;
+    document.getElementById('spstat-critical').textContent = s.critical_gaps;
+    document.getElementById('spstat-exposure').textContent = fmtInr(s.total_exposure_inr);
+
+    let html = '';
+
+    // ── Gaps section ──────────────────────────────────────────────────────────
+    if (d.gaps && d.gaps.length > 0) {
+      html += `<div class="sp-section-title">⚠ Stock Gaps (${d.gaps.length})</div>`;
+      html += d.gaps.map(g => {
+        const sevCls  = (g.gap_severity || 'low').toLowerCase();
+        const stockCls = SP_STOCK_CLS[g.stock_status] || 'sp-stock-ok';
+        const stockLbl = SP_STOCK_LBL[g.stock_status] || g.stock_status;
+        const eqTags  = (g.requiring_equipment || []).map(eq => {
+          const riskCls = 'risk-' + (eq.eq_risk || 'low').toLowerCase().replace('-','_').replace('_','-');
+          return `<span class="sp-eq-tag ${riskCls}">${escHtml(eq.tag)} (${escHtml(eq.eq_risk)})</span>`;
+        }).join('');
+        const expHtml = g.exposure_inr > 0
+          ? `<div class="sp-exposure-val">${fmtInr(g.exposure_inr)}</div><div class="sp-exposure-label">Exposure if failure</div>`
+          : `<div class="sp-exposure-zero" style="color:var(--text3);font-size:11px">Low risk<br>equipment</div>`;
+
+        return `<div class="sp-gap-card sev-${sevCls}">
+          <div class="sp-gap-left">
+            <div class="sp-gap-top">
+              <span class="sp-gap-name">${escHtml(g.name)}</span>
+              <span class="sp-sev-badge ${sevCls}">${escHtml(g.gap_severity)}</span>
+              <span class="sp-stock-status ${stockCls}">${stockLbl}</span>
+            </div>
+            <div class="sp-gap-meta">
+              <span>📦 Stock: <strong>${g.current_stock} / ${g.min_stock} min</strong></span>
+              <span>⏱ Lead time: <strong>${g.lead_time_weeks} weeks</strong></span>
+              <span>💰 Unit cost: <strong>${fmtInr(g.unit_cost_inr)}</strong></span>
+              <span>🏭 Vendor: ${escHtml(g.vendor)}</span>
+              <span>📍 ${escHtml(g.location)}</span>
+            </div>
+            ${eqTags ? `<div class="sp-gap-eq-tags">${eqTags}</div>` : ''}
+          </div>
+          <div class="sp-exposure">${expHtml}</div>
+        </div>`;
+      }).join('');
+    } else {
+      html += `<div class="sp-section-title">✅ Stock Gaps</div>
+        <div style="color:var(--text2);font-size:13px;padding:8px 0">All parts are adequately stocked.</div>`;
+    }
+
+    // ── Full coverage table ───────────────────────────────────────────────────
+    html += `<div class="sp-section-title" style="margin-top:8px">📋 Full Parts Coverage (${d.coverage.length})</div>`;
+    html += `<table class="sp-table">
+      <thead><tr>
+        <th>Part</th><th>Part No.</th><th>Stock</th><th>Lead Time</th><th>Status</th><th>Location</th>
+      </tr></thead><tbody>
+      ${(d.coverage || []).map(p => {
+        const stCls = SP_STOCK_CLS[p.stock_status] || 'sp-stock-ok';
+        const stLbl = SP_STOCK_LBL[p.stock_status] || p.stock_status;
+        return `<tr>
+          <td><strong>${escHtml(p.name)}</strong>${p.is_critical ? ' <span style="color:#ef4444;font-size:10px">★ Critical</span>' : ''}</td>
+          <td style="color:var(--text3)">${escHtml(p.part_no)}</td>
+          <td>${p.current_stock} / ${p.min_stock}</td>
+          <td>${p.lead_time_weeks}w</td>
+          <td><span class="sp-stock-status ${stCls}">${stLbl}</span></td>
+          <td style="color:var(--text3)">${escHtml(p.location)}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>`;
+
+    body.innerHTML = html;
+    spDataLoaded = true;
+  } catch(e) {
+    body.innerHTML = `<div class="sp-placeholder">Could not load spare parts data.</div>`;
+  }
+}
+
+
+// ── Regulatory Deadline Tracker ───────────────────────────────────────────────
+let rdtVisible = false;
+let rdtDataLoaded = false;
+let rdtAllItems = [];
+let rdtActiveFilter = 'all';
+
+const ALL_PANELS = [
+  ['graphVisible',  'graph-view',   'graph-tab-btn'],
+  ['healthVisible', 'health-view',  'health-tab-btn'],
+  ['woVisible',     'wo-view',      'wo-tab-btn'],
+  ['whatifVisible', 'whatif-view',  'whatif-tab-btn'],
+  ['ipmVisible',    'ipm-view',     'ipm-tab-btn'],
+  ['spVisible',     'sp-view',      'sp-tab-btn'],
+];
+
+function toggleRDTView() {
+  rdtVisible = !rdtVisible;
+  document.getElementById('rdt-view').classList.toggle('show', rdtVisible);
+  document.getElementById('rdt-tab-btn').classList.toggle('active', rdtVisible);
+  document.querySelector('.chat-wrap').style.display = rdtVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display = rdtVisible ? 'none' : '';
+  if (rdtVisible) {
+    if (typeof graphVisible  !== 'undefined' && graphVisible)  { graphVisible=false;  document.getElementById('graph-view').classList.remove('show');  document.getElementById('graph-tab-btn').classList.remove('active'); }
+    if (typeof healthVisible !== 'undefined' && healthVisible) { healthVisible=false; document.getElementById('health-view').classList.remove('show'); document.getElementById('health-tab-btn').classList.remove('active'); }
+    if (typeof woVisible     !== 'undefined' && woVisible)     { woVisible=false;     document.getElementById('wo-view').classList.remove('show');     document.getElementById('wo-tab-btn').classList.remove('active'); }
+    if (typeof whatifVisible !== 'undefined' && whatifVisible) { whatifVisible=false; document.getElementById('whatif-view').classList.remove('show'); document.getElementById('whatif-tab-btn').classList.remove('active'); }
+    if (typeof ipmVisible    !== 'undefined' && ipmVisible)    { ipmVisible=false;    document.getElementById('ipm-view').classList.remove('show');    document.getElementById('ipm-tab-btn').classList.remove('active'); }
+    if (typeof spVisible     !== 'undefined' && spVisible)     { spVisible=false;     document.getElementById('sp-view').classList.remove('show');     document.getElementById('sp-tab-btn').classList.remove('active'); }
+    if (!rdtDataLoaded) loadRDTData();
+  }
+}
+
+async function loadRDTData() {
+  try {
+    const r = await fetch('/api/regulatory-deadlines');
+    const d = await r.json();
+    if (d.error) { document.getElementById('rdt-body').innerHTML = `<div class="rdt-empty">Error: ${escHtml(d.error)}</div>`; return; }
+
+    rdtAllItems = d.items || [];
+    const s = d.summary;
+    document.getElementById('rdtstat-overdue').textContent  = s.overdue;
+    document.getElementById('rdtstat-soon').textContent     = s.due_soon;
+    document.getElementById('rdtstat-upcoming').textContent = s.upcoming;
+    document.getElementById('rdtstat-done').textContent     = s.completed;
+
+    renderRDTItems();
+    rdtDataLoaded = true;
+  } catch(e) {
+    document.getElementById('rdt-body').innerHTML = '<div class="rdt-empty">Could not load deadline data.</div>';
+  }
+}
+
+function setRDTFilter(filter) {
+  rdtActiveFilter = filter;
+  document.querySelectorAll('.rdt-filter').forEach(f => {
+    f.classList.toggle('active', f.dataset.filter === filter);
+  });
+  renderRDTItems();
+}
+
+function renderRDTItems() {
+  const body = document.getElementById('rdt-body');
+  const filtered = rdtActiveFilter === 'all'
+    ? rdtAllItems
+    : rdtAllItems.filter(i => i.status.toLowerCase() === rdtActiveFilter);
+
+  const SEV_CLS = {CRITICAL:'rdt-sev-critical',HIGH:'rdt-sev-high',MEDIUM:'rdt-sev-medium',LOW:'rdt-sev-low'};
+  const STATUS_LABEL = {OVERDUE:'Overdue',DUE_SOON:'Due Soon',UPCOMING:'Upcoming',IN_PROGRESS:'In Progress',COMPLETED:'Completed'};
+
+  const filtersHtml = `<div class="rdt-filters">
+    ${['all','overdue','due_soon','upcoming','completed'].map(f => {
+      const lbl = f === 'all' ? 'All' : f === 'due_soon' ? 'Due Soon' : f.charAt(0).toUpperCase() + f.slice(1).replace('_',' ');
+      return `<span class="rdt-filter filter-${f} ${rdtActiveFilter===f?'active':''}" data-filter="${f}" onclick="setRDTFilter('${f}')">${lbl}</span>`;
+    }).join('')}
+  </div>`;
+
+  if (filtered.length === 0) {
+    body.innerHTML = filtersHtml + '<div class="rdt-empty">No items in this category.</div>';
+    return;
+  }
+
+  const itemsHtml = filtered.map(item => {
+    const st    = item.status.toLowerCase();
+    const sevCls = SEV_CLS[item.severity] || 'rdt-sev-low';
+    const stLbl  = STATUS_LABEL[item.status] || item.status;
+
+    let daysBadgeHtml = '';
+    if (item.status === 'OVERDUE') {
+      daysBadgeHtml = `<div class="rdt-days-badge overdue"><div class="rdt-days-num">${item.overdue_days}</div><div class="rdt-days-unit">days overdue</div></div>`;
+    } else if (item.status === 'DUE_SOON') {
+      daysBadgeHtml = `<div class="rdt-days-badge due_soon"><div class="rdt-days-num">${item.days_remaining}</div><div class="rdt-days-unit">days left</div></div>`;
+    } else if (item.status === 'UPCOMING') {
+      daysBadgeHtml = `<div class="rdt-days-badge upcoming"><div class="rdt-days-num">${item.days_remaining}</div><div class="rdt-days-unit">days away</div></div>`;
+    } else if (item.status === 'COMPLETED') {
+      daysBadgeHtml = `<div class="rdt-days-badge completed"><div class="rdt-days-num">✓</div><div class="rdt-days-unit">Done</div></div>`;
+    } else {
+      daysBadgeHtml = `<div class="rdt-days-badge"><div class="rdt-days-num" style="font-size:14px;color:var(--text3)">N/A</div></div>`;
+    }
+
+    const metaParts = [
+      item.regulation ? `📋 ${escHtml(item.regulation)}` : '',
+      item.category   ? `🏷 ${escHtml(item.category)}` : '',
+      item.responsible ? `👤 ${escHtml(item.responsible)}` : '',
+      item.due_date   ? `📆 Due: ${escHtml(item.due_date)}` : '',
+      item.frequency_days ? `🔁 Every ${item.frequency_days} days` : '',
+    ].filter(Boolean).join('<span style="opacity:0.3"> | </span>');
+
+    const actionHtml = item.action_required
+      ? `<div class="rdt-item-action">→ ${escHtml(item.action_required)}</div>` : '';
+
+    return `<div class="rdt-item status-${st}">
+      ${daysBadgeHtml}
+      <div class="rdt-item-body">
+        <div class="rdt-item-top">
+          <div class="rdt-item-desc">${escHtml(item.description)}</div>
+          <span class="rdt-status-badge ${st}">${stLbl}</span>
+          <span class="rdt-sev-badge ${sevCls}">${escHtml(item.severity)}</span>
+        </div>
+        <div class="rdt-item-meta">${metaParts}</div>
+        ${actionHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  body.innerHTML = filtersHtml + itemsHtml;
+}
+
+
+// ── Maintenance Window Optimizer ──────────────────────────────────────────────
+let mwoVisible = false;
+let mwoEqLoaded = false;
+
+const RISK_COLORS_MWO = {
+  CRITICAL:'#ef4444',HIGH:'#f97316','MEDIUM-HIGH':'#f59e0b',
+  MEDIUM:'#3b82f6','LOW-MEDIUM':'#10b981',LOW:'#10b981',UNKNOWN:'#64748b'
+};
+
+function toggleMWOView() {
+  mwoVisible = !mwoVisible;
+  document.getElementById('mwo-view').classList.toggle('show', mwoVisible);
+  document.getElementById('mwo-tab-btn').classList.toggle('active', mwoVisible);
+  document.querySelector('.chat-wrap').style.display = mwoVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display = mwoVisible ? 'none' : '';
+  const others = [
+    ['graphVisible','graph-view','graph-tab-btn'],
+    ['healthVisible','health-view','health-tab-btn'],
+    ['woVisible','wo-view','wo-tab-btn'],
+    ['whatifVisible','whatif-view','whatif-tab-btn'],
+    ['ipmVisible','ipm-view','ipm-tab-btn'],
+    ['spVisible','sp-view','sp-tab-btn'],
+    ['rdtVisible','rdt-view','rdt-tab-btn'],
+  ];
+  if (mwoVisible) {
+    others.forEach(([flag, viewId, btnId]) => {
+      try { if (window[flag]) { window[flag]=false; document.getElementById(viewId).classList.remove('show'); document.getElementById(btnId).classList.remove('active'); } } catch(e){}
+    });
+    if (!mwoEqLoaded) loadMWOEquipment();
+  }
+}
+
+async function loadMWOEquipment() {
+  try {
+    const r = await fetch('/api/maintenance-window/equipment');
+    const d = await r.json();
+    const sel = document.getElementById('mwo-eq-select');
+    (d.equipment || []).forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.tag;
+      opt.textContent = `${e.tag}: ${e.name} (${e.risk})`;
+      sel.appendChild(opt);
+    });
+    mwoEqLoaded = true;
+  } catch(e) { console.error('MWO eq load:', e); }
+}
+
+async function runMWOPlan() {
+  const tag = document.getElementById('mwo-eq-select').value;
+  if (!tag) { showToast('Select equipment first.'); return; }
+  const btn = document.getElementById('mwo-plan-btn');
+  btn.disabled = true; btn.textContent = '⏳ Optimizing...';
+  try {
+    const r = await fetch('/api/maintenance-window/plan', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({tag}),
+    });
+    const d = await r.json();
+    if (d.error) { showToast('Error: ' + d.error, 'error'); return; }
+    renderMWOResults(d);
+  } catch(e) { showToast('Could not reach server.', 'error'); }
+  finally { btn.disabled=false; btn.textContent='🔩 Optimize Window'; }
+}
+
+function renderMWOResults(d) {
+  const right = document.getElementById('mwo-right');
+  const p = d.primary;
+  const ws = d.window_summary;
+  const top = d.top_candidates || [];
+  const all = d.candidates || [];
+  const others = all.filter(c => !top.find(t => t.tag === c.tag));
+
+  // Summary banner
+  const bannerHtml = `<div class="mwo-summary-banner">
+    <div class="mwo-summary-stat"><div class="mwo-summary-val">${ws.hours_primary_only}h</div><div class="mwo-summary-label">Primary only</div></div>
+    <div style="color:var(--text3);font-size:18px">→</div>
+    <div class="mwo-summary-stat"><div class="mwo-summary-val">${ws.hours_together}h</div><div class="mwo-summary-label">Combined window</div></div>
+    <div style="color:var(--text3);font-size:18px">=</div>
+    <div class="mwo-summary-stat"><div class="mwo-summary-val saved">${ws.hours_saved}h saved</div><div class="mwo-summary-label">Downtime avoided</div></div>
+    <div style="margin-left:auto;font-size:12px;color:var(--text2)">
+      Crew: <strong>${ws.crew_types.join(', ')}</strong><br>
+      Parts: <strong>${ws.parts_in_stock}/${ws.total_parts} in stock</strong>
+    </div>
+  </div>`;
+
+  // Primary card
+  const riskCol = RISK_COLORS_MWO[p.risk] || '#64748b';
+  const primaryHtml = `<div class="mwo-primary-card">
+    <div class="mwo-primary-label">🔴 Primary Equipment: Requires Shutdown</div>
+    <div class="mwo-primary-top">
+      <span class="mwo-primary-tag">${escHtml(p.tag)}</span>
+      <span class="mwo-primary-name">${escHtml(p.name)}</span>
+      <span style="font-size:12px;font-weight:700;color:${riskCol}">${escHtml(p.risk)}</span>
+    </div>
+    <div class="mwo-primary-meta">
+      <span>⏱ Est. shutdown: <strong>${p.est_hours}h</strong></span>
+      <span>👷 Crew: <strong>${escHtml(p.trade)}</strong></span>
+      ${p.pid_section ? `<span>📐 Section: <strong>${escHtml(p.pid_section)}</strong></span>` : ''}
+      ${p.h2s_service ? '<span style="color:#ef4444">☣ H2S service</span>' : ''}
+    </div>
+  </div>`;
+
+  const scoreClass = s => s >= 30 ? 'high' : s >= 15 ? 'med' : 'low';
+
+  const renderCandidate = (c) => {
+    const sc = scoreClass(c.score);
+    const rc = RISK_COLORS_MWO[c.risk] || '#64748b';
+    const reasons = c.reasons.map(r => `<span class="mwo-reason-tag">${escHtml(r)}</span>`).join('');
+    const forecast = c.forecast_text ? `<div class="mwo-forecast-line">📈 ${escHtml(c.forecast_text)}</div>` : '';
+    return `<div class="mwo-candidate score-${sc}">
+      <div class="mwo-score-circle ${sc}">${c.score}</div>
+      <div class="mwo-cand-body">
+        <div class="mwo-cand-top">
+          <span class="mwo-cand-tag">${escHtml(c.tag)}</span>
+          <span class="mwo-cand-name">${escHtml(c.name)}</span>
+          <span style="font-size:11px;font-weight:700;color:${rc}">${escHtml(c.risk)}</span>
+          <span style="font-size:11px;color:var(--text3)">⏱ ${c.est_hours}h</span>
+        </div>
+        <div class="mwo-cand-reasons">${reasons}</div>
+        ${forecast}
+      </div>
+    </div>`;
+  };
+
+  // Parts summary
+  let partsHtml = '';
+  const allParts = [];
+  const partsSeen = new Set();
+  for (const tag of [p.tag, ...top.map(c => c.tag)]) {
+    const cand = top.find(c => c.tag === tag) || (tag === p.tag ? null : null);
+    const pts = cand ? cand.parts_needed : [];
+    pts.forEach(pt => {
+      const key = pt.name;
+      if (!partsSeen.has(key)) {
+        partsSeen.add(key);
+        allParts.push({...pt, for_tag: tag});
+      }
+    });
+  }
+  if (allParts.length > 0) {
+    partsHtml = `<div class="mwo-section">🔧 Required Spare Parts</div>
+    <table class="mwo-parts-table"><thead><tr><th>Part</th><th>For</th><th>Stock</th><th>Lead Time</th></tr></thead><tbody>
+    ${allParts.map(pt => `<tr>
+      <td>${escHtml(pt.name)}</td>
+      <td style="color:var(--text3)">${escHtml(pt.for_tag)}</td>
+      <td class="${pt.in_stock ? 'mwo-in-stock' : 'mwo-no-stock'}">${pt.in_stock ? `✓ ${pt.stock} in stock` : '✗ Out of stock'}</td>
+      <td style="color:var(--text3)">${pt.lead_weeks}w</td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  // Process impact
+  const impact = d.process_impact || {};
+  const impactedTags = (impact.impacted_tags || []).filter(t => t !== p.tag);
+  const impactHtml = impactedTags.length > 0
+    ? `<div class="mwo-section">⚠ Process Impact</div>
+       <div style="font-size:12px;color:var(--text2);background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;line-height:1.7">
+         Equipment offline during window: <strong>${impactedTags.join(', ')}</strong><br>
+         ${Object.keys(impact.standby_available||{}).length > 0
+           ? 'Standby available for: ' + Object.entries(impact.standby_available).map(([k,v]) => `${k} → ${v}`).join(', ')
+           : 'No standby equipment identified for affected units.'}
+       </div>` : '';
+
+  // Others (lower score)
+  const othersHtml = others.length > 0
+    ? `<div class="mwo-section">Other Equipment (Lower Priority)</div>${others.map(renderCandidate).join('')}` : '';
+
+  right.innerHTML = bannerHtml + primaryHtml
+    + (top.length > 0 ? `<div class="mwo-section">✅ Recommended Co-Maintenance (Score ≥ 20)</div>${top.map(renderCandidate).join('')}` : '<div style="color:var(--text3);font-size:13px">No high-priority co-maintenance candidates found.</div>')
+    + impactHtml
+    + partsHtml
+    + othersHtml;
+}
+
+
+// ── Risk Cascade Analyzer ──────────────────────────────────────────────────────
+let rcaVisible = false;
+let rcaEqLoaded = false;
+
+const RISK_COL = {CRITICAL:'#ef4444',HIGH:'#f97316','MEDIUM-HIGH':'#f59e0b',MEDIUM:'#3b82f6','LOW-MEDIUM':'#10b981',LOW:'#10b981',UNKNOWN:'#64748b'};
+
+function toggleRCAView() {
+  rcaVisible = !rcaVisible;
+  document.getElementById('rca-view').classList.toggle('show', rcaVisible);
+  document.getElementById('rca-tab-btn').classList.toggle('active', rcaVisible);
+  document.querySelector('.chat-wrap').style.display = rcaVisible ? 'none' : '';
+  document.querySelector('.input-bar').style.display = rcaVisible ? 'none' : '';
+  const others = [
+    ['graphVisible','graph-view','graph-tab-btn'],['healthVisible','health-view','health-tab-btn'],
+    ['woVisible','wo-view','wo-tab-btn'],['whatifVisible','whatif-view','whatif-tab-btn'],
+    ['ipmVisible','ipm-view','ipm-tab-btn'],['spVisible','sp-view','sp-tab-btn'],
+    ['rdtVisible','rdt-view','rdt-tab-btn'],['mwoVisible','mwo-view','mwo-tab-btn'],
+  ];
+  if (rcaVisible) {
+    others.forEach(([flag,vid,bid]) => {
+      try { if (window[flag]) { window[flag]=false; document.getElementById(vid).classList.remove('show'); document.getElementById(bid).classList.remove('active'); } } catch(e){}
+    });
+    if (!rcaEqLoaded) loadRCAEquipment();
+  }
+}
+
+async function loadRCAEquipment() {
+  try {
+    const r = await fetch('/api/cascade/equipment');
+    const d = await r.json();
+    const sel = document.getElementById('rca-eq-select');
+    (d.equipment || []).forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.tag;
+      opt.textContent = `${e.tag}: ${e.name} (${e.risk})`;
+      sel.appendChild(opt);
+    });
+    rcaEqLoaded = true;
+  } catch(e) { console.error('RCA eq load:', e); }
+}
+
+async function runRCAAnalysis() {
+  const tag = document.getElementById('rca-eq-select').value;
+  if (!tag) { showToast('Select equipment first.'); return; }
+  const btn = document.getElementById('rca-run-btn');
+  btn.disabled=true; btn.textContent='⏳ Analyzing...';
+  try {
+    const r = await fetch('/api/cascade/analyze', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({tag}),
+    });
+    const d = await r.json();
+    if (d.error) { showToast('Error: ' + d.error, 'error'); return; }
+    renderRCAResults(d);
+  } catch(e) { showToast('Could not reach server.', 'error'); }
+  finally { btn.disabled=false; btn.textContent='💥 Analyze Cascade'; }
+}
+
+function renderRCAResults(d) {
+  const right = document.getElementById('rca-right');
+  const f = d.failed;
+  const s = d.summary;
+  const cascade = d.cascade || [];
+  const chain   = d.chain   || [];
+  const direct   = cascade.filter(c => c.impact_type === 'DIRECT');
+  const indirect = cascade.filter(c => c.impact_type === 'INDIRECT');
+  const resource = cascade.filter(c => c.impact_type === 'RESOURCE');
+
+  const fmtLoss = v => v >= 100000 ? `₹${(v/100000).toFixed(1)}L/hr` : `₹${(v/1000).toFixed(0)}K/hr`;
+
+  // Impact banner
+  const bannerHtml = `<div class="rca-impact-banner">
+    <div class="rca-impact-stat"><div class="rca-impact-val direct">${s.direct_count}</div><div class="rca-impact-label">Direct impacts</div></div>
+    <div class="rca-impact-stat"><div class="rca-impact-val indirect">${s.indirect_count}</div><div class="rca-impact-label">Indirect</div></div>
+    <div class="rca-impact-stat"><div class="rca-impact-val resource">${s.resource_count}</div><div class="rca-impact-label">Resource risk</div></div>
+    <div style="margin-left:auto;text-align:right">
+      <div class="rca-impact-val loss">${fmtLoss(s.total_prod_loss_per_hour)}</div>
+      <div class="rca-impact-label">Est. production loss</div>
+    </div>
+  </div>`;
+
+  // Failed card
+  const failedHtml = `<div class="rca-failed-card">
+    <div class="rca-failed-label">💥 Simulated Failure</div>
+    <div class="rca-failed-name">${escHtml(f.tag)}: ${escHtml(f.name)}</div>
+    <div class="rca-failed-meta">
+      Risk: <strong style="color:${RISK_COL[f.risk]||'#64748b'}">${escHtml(f.risk||'UNKNOWN')}</strong>
+      &nbsp;|&nbsp; Own loss: <strong>${fmtLoss(f.prod_loss_per_hour)}</strong>
+      ${f.h2s_service ? '&nbsp;|&nbsp; <span style="color:#ef4444">☣ H2S service</span>' : ''}
+    </div>
+  </div>`;
+
+  // Cascade chain diagram
+  let chainHtml = '';
+  if (chain.length > 0) {
+    // Build visual chain, showing direct process chain (non-resource steps only)
+    const processSteps = chain.filter(s => s.relation !== 'RESOURCE');
+    if (processSteps.length > 0) {
+      chainHtml = `<div class="rca-diagram">
+        <div class="rca-diagram-title">📡 Failure Propagation Chain</div>
+        <div class="rca-chain">
+          <div class="rca-chain-step">
+            <span class="rca-chain-node failed">💥 ${escHtml(f.tag)}</span>
+          </div>`;
+      processSteps.forEach(step => {
+        const typCls = step.relation === 'DIRECT' ? 'direct' : 'indirect';
+        chainHtml += `<div class="rca-chain-step">
+            <span class="rca-chain-arrow">↓</span>
+            <span class="rca-chain-node ${typCls}">${escHtml(step.to)}</span>
+            <span class="rca-chain-reason">${escHtml(step.reason.substring(0,80))}</span>
+          </div>`;
+      });
+      chainHtml += `</div></div>`;
+    }
+  }
+
+  const renderImpact = (c) => {
+    const tc = c.impact_type.toLowerCase();
+    const riskColor = RISK_COL[c.current_risk] || '#64748b';
+    const standbyPill = c.has_standby && c.standby_tag
+      ? `<span class="rca-standby-pill">✓ Standby ${escHtml(c.standby_tag)} available</span>` : '';
+    return `<div class="rca-impact-card ${tc}">
+      <span class="rca-impact-badge ${tc}">${c.impact_type}</span>
+      <div class="rca-impact-body">
+        <div class="rca-impact-top">
+          <span class="rca-impact-tag">${escHtml(c.tag)}</span>
+          <span class="rca-impact-name">${escHtml(c.name)}</span>
+          <span style="font-size:11px;font-weight:600;color:${riskColor}">${escHtml(c.current_risk)}</span>
+          <span style="font-size:11px;color:var(--text3)">${fmtLoss(c.prod_loss_per_hour)}</span>
+        </div>
+        <div class="rca-impact-reason">${escHtml(c.reason)}</div>
+        ${standbyPill}
+      </div>
+    </div>`;
+  };
+
+  // Mitigations
+  const mitHtml = (d.mitigations || []).map(m => {
+    const icon = m.includes('standby') ? '🔄' : m.includes('H2S') ? '☣' : m.includes('Notify') ? '📢' : '⚡';
+    return `<div class="rca-mitigation"><span class="rca-mit-icon">${icon}</span><span>${escHtml(m)}</span></div>`;
+  }).join('');
+
+  right.innerHTML = bannerHtml + failedHtml + chainHtml
+    + (direct.length   ? `<div class="rca-section">🔴 Direct Impacts (${direct.length})</div>${direct.map(renderImpact).join('')}` : '')
+    + (indirect.length ? `<div class="rca-section">🟠 Indirect Impacts (${indirect.length})</div>${indirect.map(renderImpact).join('')}` : '')
+    + (resource.length ? `<div class="rca-section">🔶 Resource / Utility Risk (${resource.length})</div>${resource.map(renderImpact).join('')}` : '')
+    + (mitHtml ? `<div class="rca-section">🛡 Recommended Mitigations</div><div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px">${mitHtml}</div>` : '');
+}
+
+
+// ── Carbon Energy Impact Calculator ─────────────────────────────────────────
+let carbonPanelOpen = false;
+let carbonDataLoaded = false;
+
+function toggleCarbonPanel() {
+  carbonPanelOpen = !carbonPanelOpen;
+  document.getElementById('carbon-panel').classList.toggle('open', carbonPanelOpen);
+  if (carbonPanelOpen && !carbonDataLoaded) loadCarbonData();
+}
+
+async function loadCarbonData() {
+  const body = document.getElementById('carbon-panel-body');
+  try {
+    const r = await fetch('/api/carbon-impact');
+    const d = await r.json();
+    if (d.error) { body.innerHTML = `<div style="color:#ef4444;font-size:12px">${escHtml(d.error)}</div>`; return; }
+
+    const s = d.summary;
+    const maxKwh = d.equipment.length > 0 ? d.equipment[0].energy_waste_kwh_day : 1;
+
+    const PENALTY_LABELS = {
+      vibration: 'Vibration loss',
+      bearing_temp: 'Bearing heat',
+      oil_contamination: 'Oil friction',
+    };
+
+    body.innerHTML = `
+      <div class="carbon-stats">
+        <div class="carbon-stat">
+          <div class="carbon-stat-val amber">${s.total_energy_waste_kwh_day}</div>
+          <div class="carbon-stat-label">kWh/day wasted</div>
+        </div>
+        <div class="carbon-stat">
+          <div class="carbon-stat-val red">${s.total_co2_waste_kg_day} kg</div>
+          <div class="carbon-stat-label">CO₂/day extra</div>
+        </div>
+        <div class="carbon-stat">
+          <div class="carbon-stat-val red">${s.total_co2_waste_annual_t} t</div>
+          <div class="carbon-stat-label">CO₂/year avoidable</div>
+        </div>
+        <div class="carbon-stat">
+          <div class="carbon-stat-val amber">${s.shutdown_co2_risk_kg} kg</div>
+          <div class="carbon-stat-label">Flare CO₂ risk</div>
+        </div>
+      </div>
+
+      <div class="carbon-section-label">Equipment Energy Penalties</div>
+      ${d.equipment.map(e => {
+        const barPct = Math.round((e.energy_waste_kwh_day / maxKwh) * 100);
+        const pills = Object.entries(e.energy_penalties)
+          .map(([k,v]) => `<span class="carbon-pen-pill">${PENALTY_LABELS[k]||k}: ${v} kWh</span>`).join('');
+        return `<div class="carbon-eq-row">
+          <div class="carbon-eq-top">
+            <span class="carbon-eq-tag">${escHtml(e.tag)}</span>
+            <span class="carbon-eq-name">${escHtml(e.name)}</span>
+            <span class="carbon-eq-kwh">+${e.energy_waste_kwh_day} kWh/day</span>
+          </div>
+          <div class="carbon-bar-track"><div class="carbon-bar-fill" style="width:${barPct}%"></div></div>
+          <div class="carbon-penalties">${pills}</div>
+        </div>`;
+      }).join('')}
+
+      <div class="carbon-section-label">Recommendations</div>
+      <div style="display:flex;flex-direction:column">
+        ${d.recommendations.slice(0,-1).map(rec => {
+          const icon = rec.includes('Repair') ? '🔧' : rec.includes('Vibration') ? '📳' : rec.includes('Oil') ? '🛢' : rec.includes('shutdown') ? '⚡' : '💡';
+          return `<div class="carbon-rec"><span class="carbon-rec-icon">${icon}</span><span>${escHtml(rec)}</span></div>`;
+        }).join('')}
+      </div>
+
+      <div class="carbon-disclaimer">${escHtml(d.disclaimer)}</div>
+    `;
+    carbonDataLoaded = true;
+  } catch(e) {
+    body.innerHTML = '<div style="color:#ef4444;font-size:12px">Could not load carbon data.</div>';
+  }
+}
+
+</script>
+
+  <!-- Carbon Energy Impact FAB -->
+  <button class="carbon-fab" onclick="toggleCarbonPanel()" title="Carbon and Energy Impact">🌿</button>
+  <div class="carbon-panel" id="carbon-panel">
+    <div class="carbon-panel-header">
+      <span>🌿</span>
+      <h4>Carbon and Energy Impact</h4>
+      <button class="carbon-panel-close" onclick="toggleCarbonPanel()">✕</button>
+    </div>
+    <div class="carbon-panel-body" id="carbon-panel-body">
+      <div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Loading...</div>
+    </div>
+  </div>
+
+</body>
+</html>
